@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from flask import Flask
-from controllers.permisos import permisos_bp  # Ajusta la ruta de importación según tu estructura
+from controllers.permisos_controller import permisos_bp  # Ajusta la ruta de importación según tu estructura
 
 @pytest.fixture
 def app():
@@ -21,8 +21,8 @@ def client(app):
     return app.test_client()
 
 
-@patch('controllers.permisos.Permiso')
-@patch('controllers.permisos.requiere_superusuario')
+@patch('controllers.permisos_controller.Permiso')
+@patch('controllers.permisos_controller.requiere_superusuario')
 def test_gestionar_permisos_get_sin_rol(mock_superusuario, mock_permiso, client):
     """Prueba de humo para cargar la vista GET de gestión de permisos sin un rol seleccionado."""
     mock_superusuario.return_value = lambda f: f
@@ -43,8 +43,8 @@ def test_gestionar_permisos_get_sin_rol(mock_superusuario, mock_permiso, client)
     mock_permiso.obtener_modulos_activos.assert_not_called()
 
 
-@patch('controllers.permisos.Permiso')
-@patch('controllers.permisos.requiere_superusuario')
+@patch('controllers.permisos_controller.Permiso')
+@patch('controllers.permisos_controller.requiere_superusuario')
 def test_gestionar_permisos_get_con_rol(mock_superusuario, mock_permiso, client):
     """Prueba de humo para cargar la vista GET cuando ya viene un rol seleccionado por parámetro URL."""
     mock_superusuario.return_value = lambda f: f
@@ -66,9 +66,9 @@ def test_gestionar_permisos_get_con_rol(mock_superusuario, mock_permiso, client)
     mock_permiso.obtener_permisos_asignados_rol.assert_called_once_with(1)
 
 
-@patch('controllers.permisos.NotificacionManager')
-@patch('controllers.permisos.Permiso')
-@patch('controllers.permisos.requiere_superusuario')
+@patch('controllers.permisos_controller.NotificacionManager')
+@patch('controllers.permisos_controller.Permiso')
+@patch('controllers.permisos_controller.requiere_superusuario')
 def test_gestionar_permisos_post_exitoso(mock_superusuario, mock_permiso, mock_notificacion, client):
     """Prueba de humo para la sincronización exitosa de la matriz de permisos (POST)."""
     mock_superusuario.return_value = lambda f: f
@@ -90,9 +90,9 @@ def test_gestionar_permisos_post_exitoso(mock_superusuario, mock_permiso, mock_n
     mock_notificacion.crear.assert_called_once()
 
 
-@patch('controllers.permisos.NotificacionManager')
-@patch('controllers.permisos.Permiso')
-@patch('controllers.permisos.requiere_superusuario')
+@patch('controllers.permisos_controller.NotificacionManager')
+@patch('controllers.permisos_controller.Permiso')
+@patch('controllers.permisos_controller.requiere_superusuario')
 def test_gestionar_permisos_post_con_error(mock_superusuario, mock_permiso, mock_notificacion, client):
     """Prueba de humo para validar el manejo de errores cuando la sincronización de permisos falla."""
     mock_superusuario.return_value = lambda f: f

@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from flask import Flask
-from controllers.rol import roles_bp  # Ajusta la ruta de importación según tu estructura
+from controllers.rolcontroller import roles_bp  # Ajusta la ruta de importación según tu estructura
 
 @pytest.fixture
 def app():
@@ -21,9 +21,9 @@ def client(app):
     return app.test_client()
 
 
-@patch('controllers.rol.Rol')
-@patch('controllers.rol.NotificacionManager')
-@patch('controllers.rol.requiere_permiso')
+@patch('controllers.rolcontroller.Rol')
+@patch('controllers.rolcontroller.NotificacionManager')
+@patch('controllers.rolcontroller.requiere_permiso')
 def test_gestion_roles_get(mock_permiso, mock_notificacion, mock_rol, client):
     """Prueba de humo para verificar la carga de la vista GET de gestión de roles."""
     mock_permiso.return_value = lambda f: f
@@ -43,9 +43,9 @@ def test_gestion_roles_get(mock_permiso, mock_notificacion, mock_rol, client):
     mock_rol.obtener_todos.assert_called_once()
 
 
-@patch('controllers.rol.Rol')
-@patch('controllers.rol.NotificacionManager')
-@patch('controllers.rol.requiere_permiso')
+@patch('controllers.rolcontroller.Rol')
+@patch('controllers.rolcontroller.NotificacionManager')
+@patch('controllers.rolcontroller.requiere_permiso')
 def test_gestion_roles_post_crear(mock_permiso, mock_notificacion, mock_rol, client):
     """Prueba de humo para el registro exitoso de un nuevo rol vía POST."""
     mock_permiso.return_value = lambda f: f
@@ -69,9 +69,9 @@ def test_gestion_roles_post_crear(mock_permiso, mock_notificacion, mock_rol, cli
     mock_notificacion.crear.assert_called_once()
 
 
-@patch('controllers.rol.Rol')
-@patch('controllers.rol.NotificacionManager')
-@patch('controllers.rol.requiere_permiso')
+@patch('controllers.rolcontroller.Rol')
+@patch('controllers.rolcontroller.NotificacionManager')
+@patch('controllers.rolcontroller.requiere_permiso')
 def test_editar_rol_post(mock_permiso, mock_notificacion, mock_rol, client):
     """Prueba de humo para la actualización de un rol existente."""
     mock_permiso.return_value = lambda f: f
@@ -94,9 +94,9 @@ def test_editar_rol_post(mock_permiso, mock_notificacion, mock_rol, client):
     mock_notificacion.crear.assert_called_once()
 
 
-@patch('controllers.rol.Rol')
-@patch('controllers.rol.NotificacionManager')
-@patch('controllers.rol.requiere_permiso')
+@patch('controllers.rolcontroller.Rol')
+@patch('controllers.rolcontroller.NotificacionManager')
+@patch('controllers.rolcontroller.requiere_permiso')
 def test_eliminar_rol_post(mock_permiso, mock_notificacion, mock_rol, client):
     """Prueba de humo para la desactivación o eliminación lógica de un rol."""
     mock_permiso.return_value = lambda f: f

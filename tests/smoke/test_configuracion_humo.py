@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from flask import Flask
-from controllers.configuracion import config_bp  # Ajusta la ruta de importación según tu estructura
+from controllers.configuracion_controller import config_bp  # Ajusta la ruta de importación según tu estructura
 
 @pytest.fixture
 def app():
@@ -21,9 +21,9 @@ def client(app):
     return app.test_client()
 
 
-@patch('controllers.configuracion.Modulo')
-@patch('controllers.configuracion.Accion')
-@patch('controllers.configuracion.requiere_permiso')
+@patch('controllers.configuracion_controller.Modulo')
+@patch('controllers.configuracion_controller.Accion')
+@patch('controllers.configuracion_controller.requiere_permiso')
 def test_gestion_configuracion_get(mock_permiso, mock_accion, mock_modulo, client):
     """Prueba de humo para la carga de la vista GET de módulos y acciones."""
     mock_permiso.return_value = lambda f: f
@@ -43,10 +43,10 @@ def test_gestion_configuracion_get(mock_permiso, mock_accion, mock_modulo, clien
 
 # ================= PRUEBAS PARA MÓDULOS =================
 
-@patch('controllers.configuracion.os.path.exists')
-@patch('controllers.configuracion.Modulo')
-@patch('controllers.configuracion.NotificacionManager')
-@patch('controllers.configuracion.requiere_permiso')
+@patch('controllers.configuracion_controller.os.path.exists')
+@patch('controllers.configuracion_controller.Modulo')
+@patch('controllers.configuracion_controller.NotificacionManager')
+@patch('controllers.configuracion_controller.requiere_permiso')
 def test_crear_modulo_exitoso(mock_permiso, mock_notificacion, mock_modulo, mock_exists, client):
     """Prueba de humo para registrar un módulo exitosamente (cuando existen los archivos físicos)."""
     mock_permiso.return_value = lambda f: f
@@ -70,8 +70,8 @@ def test_crear_modulo_exitoso(mock_permiso, mock_notificacion, mock_modulo, mock
     mock_notificacion.crear.assert_called_once()
 
 
-@patch('controllers.configuracion.os.path.exists')
-@patch('controllers.configuracion.requiere_permiso')
+@patch('controllers.configuracion_controller.os.path.exists')
+@patch('controllers.configuracion_controller.requiere_permiso')
 def test_crear_modulo_fals_archivos_faltantes(mock_permiso, mock_exists, client):
     """Prueba de humo para validar el error cuando faltan los archivos físicos del módulo."""
     mock_permiso.return_value = lambda f: f
@@ -92,8 +92,8 @@ def test_crear_modulo_fals_archivos_faltantes(mock_permiso, mock_exists, client)
     assert "Faltan los siguientes archivos físicos" in json_data["message"]
 
 
-@patch('controllers.configuracion.Modulo')
-@patch('controllers.configuracion.NotificacionManager')
+@patch('controllers.configuracion_controller.Modulo')
+@patch('controllers.configuracion_controller.NotificacionManager')
 def test_editar_modulo(mock_notificacion, mock_modulo, client):
     """Prueba de humo para actualizar un módulo existente."""
     with client.session_transaction() as sess:
@@ -113,9 +113,9 @@ def test_editar_modulo(mock_notificacion, mock_modulo, client):
     mock_notificacion.crear.assert_called_once()
 
 
-@patch('controllers.configuracion.Modulo')
-@patch('controllers.configuracion.NotificacionManager')
-@patch('controllers.configuracion.requiere_permiso')
+@patch('controllers.configuracion_controller.Modulo')
+@patch('controllers.configuracion_controller.NotificacionManager')
+@patch('controllers.configuracion_controller.requiere_permiso')
 def test_eliminar_modulo(mock_permiso, mock_notificacion, mock_modulo, client):
     """Prueba de humo para desactivar un módulo."""
     mock_permiso.return_value = lambda f: f
@@ -136,9 +136,9 @@ def test_eliminar_modulo(mock_permiso, mock_notificacion, mock_modulo, client):
 
 # ================= PRUEBAS PARA ACCIONES =================
 
-@patch('controllers.configuracion.Accion')
-@patch('controllers.configuracion.NotificacionManager')
-@patch('controllers.configuracion.requiere_permiso')
+@patch('controllers.configuracion_controller.Accion')
+@patch('controllers.configuracion_controller.NotificacionManager')
+@patch('controllers.configuracion_controller.requiere_permiso')
 def test_crear_accion_exitosa(mock_permiso, mock_notificacion, mock_accion, client):
     """Prueba de humo para registrar una nueva acción."""
     mock_permiso.return_value = lambda f: f
@@ -160,9 +160,9 @@ def test_crear_accion_exitosa(mock_permiso, mock_notificacion, mock_accion, clie
     mock_notificacion.crear.assert_called_once()
 
 
-@patch('controllers.configuracion.Accion')
-@patch('controllers.configuracion.NotificacionManager')
-@patch('controllers.configuracion.requiere_permiso')
+@patch('controllers.configuracion_controller.Accion')
+@patch('controllers.configuracion_controller.NotificacionManager')
+@patch('controllers.configuracion_controller.requiere_permiso')
 def test_editar_accion(mock_permiso, mock_notificacion, mock_accion, client):
     """Prueba de humo para actualizar una acción existente."""
     mock_permiso.return_value = lambda f: f
@@ -184,9 +184,9 @@ def test_editar_accion(mock_permiso, mock_notificacion, mock_accion, client):
     mock_notificacion.crear.assert_called_once()
 
 
-@patch('controllers.configuracion.Accion')
-@patch('controllers.configuracion.NotificacionManager')
-@patch('controllers.configuracion.requiere_permiso')
+@patch('controllers.configuracion_controller.Accion')
+@patch('controllers.configuracion_controller.NotificacionManager')
+@patch('controllers.configuracion_controller.requiere_permiso')
 def test_eliminar_accion(mock_permiso, mock_notificacion, mock_accion, client):
     """Prueba de humo para desactivar una acción."""
     mock_permiso.return_value = lambda f: f
