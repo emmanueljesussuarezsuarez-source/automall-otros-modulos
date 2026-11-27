@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Compras de Insumos{% endblock %}
+
+{% block content %}
+<!-- Estilos de DataTables con Bootstrap 5 -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+
+<div class="container-fluid mt-4 px-4">
+
+    <!-- Mensajes Flash ocultos para capturar en compras.js -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flask-msg-data" data-message="{{ message }}" data-category="{{ category }}" style="display:none;"></div>
+        {% endfor %}
+    {% endwith %}
+
+    <!-- Barra de acciones superior -->
+    <div class="d-flex justify-content-end mb-3 gap-2 flex-wrap">
+        {% if tiene_permiso('Compras', 'p_crear') %}
+        <a href="{{ url_for('compras.nueva') }}" class="btn btn-primary shadow-sm fw-bold">
+            <i class="bi bi-plus-circle me-1"></i> Nueva Compra
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Tarjeta idéntica a Mantenimiento Operacional -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-dark text-white p-3 border-0 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold d-flex align-items-center">
+                <i class="bi bi-cart3 me-2 text-primary"></i>
+                Compras de Insumos
+            </h5>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table id="tablaCompras" class="table table-hover align-middle mb-0 nowrap" style="width:100%;">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="py-3">Código</th>
+                            <th class="py-3">Fecha</th>
+                            <th class="py-3">Proveedor</th>
+                            <th class="py-3">Tipo</th>
+                            <th class="py-3 text-center">Items</th>
+                            <th class="py-3 text-center">Estado</th>
+                            <th class="py-3 text-end px-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in compras %}
+                        <tr {% if c.estado == 'Anulada' %}class="opacity-50"{% endif %}>
+                            <td>
+                                <span class="badge bg-dark rounded-2 px-2 py-1 fs-7 font-monospace">
+                                    #{{ c.cod_compras }}
+                                </span>
+                            </td>
+                            <td>{{ c.fecha_compra }}</td>
+                            <td class="text-start fw-semibold text-dark">
+                                {{ c.proveedor or 'Sin proveedor' }}
+                            </td>
+                            <td>{{ c.tipo_compra }}</td>
+                            <td class="text-center font-monospace">{{ c.total_items or 0 }}</td>
+                            <td class="text-center">
+                                {% if c.estado == 'Completada' %}
+                                    <span class="badge rounded-pill bg-success px-3">
+                                        <i class="bi bi-check-circle me-1"></i> Completada
+                                    </span>
+                                {% elif c.estado == 'Anulada' %}
+                                    <span class="badge rounded-pill bg-danger px-3">
+                                        <i class="bi bi-x-circle me-1"></i> Anulada
+                                    </span>
+                                {% else %}
+                                    <span class="badge rounded-pill bg-warning text-dark px-3">
+                                        <i class="bi bi-clock me-1"></i> Pendiente
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-3 text-end">
+                                <div class="btn-group">
+                                    {% if tiene_permiso('Compras', 'p_leer') %}
+                                    <a href="{{ url_for('compras.detalle', cod_compras=c.cod_compras) }}"
+                                       class="btn btn-outline-info btn-sm rounded-start-2"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="Ver detalle">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% endif %}
+
+                                    {% if c.estado == 'Pendiente' and tiene_permiso('Compras', 'p_actualizar') %}
+                                    <form action="{{ url_for('compras.finalizar', cod_compras=c.cod_compras) }}"
+                                          method="POST" class="d-inline form-confirmar"
+                                          data-confirm="Se marcará la compra #{{ c.cod_compras }} como Completada."
+                                          data-confirm-title="¿Finalizar compra?"
+                                          data-confirm-button="Sí, finalizar"
+                                          data-confirm-color="#198754">
+                                        <button type="submit" class="btn btn-outline-success btn-sm"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                title="Finalizar Compra">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+
+                                    {% if c.estado != 'Anulada' and tiene_permiso('Compras', 'p_eliminar') %}
+                                    <form action="{{ url_for('compras.eliminar', cod_compras=c.cod_compras) }}"
+                                          method="POST" class="d-inline form-confirmar"
+                                          data-confirm="La compra #{{ c.cod_compras }} quedará Anulada. No se borra el histórico."
+                                          data-confirm-title="¿Anular compra?"
+                                          data-confirm-button="Sí, anular"
+                                          data-confirm-color="#dc3545">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-end-2"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                title="Anular Compra">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts de jQuery y DataTables -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Archivo JS separado -->
+<script src="{{ url_for('static', filename='js/compras.js') }}"></script>
+{% endblock %}

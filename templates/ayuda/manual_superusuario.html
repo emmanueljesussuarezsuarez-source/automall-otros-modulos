@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-lg border-0 p-4 p-md-5 rounded-4 bg-white">
+        
+        <!-- Encabezado Principal del Manual -->
+        <div class="border-bottom pb-4 mb-5">
+            <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-shield-fill-exclamation text-danger display-4 me-3"></i>
+                <div>
+                    <h1 class="fw-bold text-dark mb-1">Manual Técnico y Operativo de Superusuario</h1>
+                    
+                </div>
+            </div>
+            <div class="alert alert-danger bg-danger bg-opacity-10 border-0 text-dark rounded-3">
+                <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+                <strong>Nivel de Acceso Máximo :</strong> Este manual oficial detalla de manera minuciosa todas las operaciones de control absoluto, parametrización comercial, auditoría de seguridad y administración de infraestructura de bases de datos dentro de la plataforma AutoMall.
+            </div>
+        </div>
+
+        <!-- CAPÍTULO 1: INTRODUCCIÓN Y CONCEPTOS BÁSICOS -->
+        <section class="mb-5">
+            <h2 class="h4 fw-bold text-primary mb-3"><i class="bi bi-info-circle me-2"></i>Capítulo 1: Introducción y Guía de Uso General para Principiantes</h2>
+            <p class="text-secondary">
+                Bienvenido a la plataforma <strong>AutoMall</strong>. Si es la primera vez que interactúa con un software de gestión empresarial, es fundamental que comprenda los elementos visuales estándar que componen la interfaz gráfica del sistema:
+            </p>
+            <ul class="text-secondary">
+                <li><strong>Botones de Acción Interactivos:</strong> Son elementos rectangulares con colores distintivos ubicados en los formularios y tablas. Al hacer clic sobre ellos con el ratón, ordenan al servidor ejecutar una tarea específica (como guardar, buscar, modificar o borrar registros).</li>
+                <li><strong>Iconos de Interfaz :</strong> Pequeños dibujos intuitivos incrustados en los botones un lápiz para editar, una papelera para eliminar, un check para finalizar .</li>
+                <li><strong>Menús Desplegables de Navegación:</strong> Opciones ubicadas en la barra superior al hacer clic sobre ellas despliegan submenús temáticos para viajar rápidamente entre los diferentes módulos de la aplicación.</li>
+                <li><strong>Protocolo de Seguridad (Cierre de Sesión):</strong> Por motivos de confidencialidad e integridad de los datos financieros del concesionario, al finalizar su jornada laboral o ausentarse del equipo, debe hacer clic en su nombre de usuario en la esquina superior derecha y seleccionar la opción <strong>"Cerrar Sesión"</strong>.</li>
+            </ul>
+        </section>
+
+        <!-- CAPÍTULO 2: MÓDULO DE OPERACIONES Y ABASTECIMIENTO -->
+        <section class="mb-5">
+            <h2 class="h4 fw-bold text-primary mb-3"><i class="bi bi-car-front-fill me-2"></i>Capítulo 2: Módulo de Operaciones y Abastecimiento</h2>
+            <p class="text-secondary">Este módulo concentra toda la lógica de control del parque automotor, el registro técnico de unidades, la administración de marcas y la exhibición comercial.</p>
+            
+            <!-- Sección: Gestión de Vehículos -->
+            <div class="p-4 border rounded-3 bg-light mb-4">
+                <h4 class="fw-bold text-dark"><i class="bi bi-cart-plus text-primary me-2"></i>2.1 Gestión de Vehículos </h4>
+                <p class="text-secondary small">Es el panel central de inventario donde se da de alta cada vehículo que ingresa al concesionario.</p>
+                <h6 class="fw-bold text-dark mt-3">¿Qué hace cada botón y campo en esta pantalla?</h6>
+                <ul class="text-secondary small ps-3 mb-0">
+                    <li><span class="badge bg-primary">Registrar Vehículo</span>: Despliega el formulario principal de captura de datos técnicos (Placa única, Kilometraje, Año de fabricación, Color exterior, Modelo asociado, Marca y Propietario legal).</li>
+                    <li><span class="badge bg-secondary">Examinar / Seleccionar Archivos (Galería)</span>: Botón del sistema operativo integrado para buscar en las carpetas de su computadora múltiples imágenes del automóvil y subirlas de manera segura con nombres únicos protegidos.</li>
+                    <li><span class="badge bg-info text-dark">Casillas de Verificación Documental</span>: Sirven para marcar formalmente el estatus de los documentos legales de la unidad (Título de propiedad, experticia de tránsito, certificado de origen, póliza de seguro vigente y factura comercial de compra).</li>
+                    <li><span class="badge bg-success">Guardar / Registrar</span>: Envía toda la información escrita en el formulario hacia el servidor para almacenarla de forma permanente en la base de datos de inventario.</li>
+                    <li><span class="badge bg-warning text-dark"><i class="bi bi-pencil"></i> Botón Editar (Icono de Lápiz)</span>: Ubicado en cada fila de la tabla principal, permite abrir los datos de un vehículo ya registrado para corregir información, actualizar precios o modificar kilometraje.</li>
+                    <li><span class="badge bg-danger"><i class="bi bi-trash"></i> Botón Eliminar (Icono de Papelera)</span>: Remueve el registro del vehículos del sistema (debe utilizarse con extrema precaución ).</li>
+                </ul>
+            </div>
+
+            <div class="row g-4">
+                <!-- Submódulo: Marcas y Modelos -->
+                <div class="col-md-6">
+                    <div class="p-4 border rounded-3 bg-light h-100">
+                        <h5 class="fw-bold text-dark"><i class="bi bi-tags text-primary me-2"></i>2.2 Marcas y Modelos </h5>
+                        <p class="text-secondary small">Estructura la base de datos de fabricantes y líneas comerciales de vehículos.</p>
+                        <ul class="text-secondary small ps-3 mb-0">
+                            <li><strong>Campo de Texto de Marca:</strong> Espacio para escribir el nombre oficial del fabricante (Ej. Toyota, Ford, Chevrolet).</li>
+                            <li><span class="badge bg-primary">Guardar Marca</span>: Almacena el fabricante en el catálogo base del sistema.</li>
+                            <li><strong>Lista Desplegable de Marcas:</strong> Permite seleccionar un fabricante previamente registrado para vincularle un nuevo modelo.</li>
+                            <li><span class="badge bg-primary">Guardar Modelo</span>: Registra la línea comercial específica (Ej. Corolla, Explorer) asociada al fabricante seleccionado.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Submódulo: Catálogo e Historial -->
+                <div class="col-md-6">
+                    <div class="p-4 border rounded-3 bg-light h-100">
+                        <h5 class="fw-bold text-dark"><i class="bi bi-search text-primary me-2"></i>2.3 Catálogo e Historial </h5>
+                        <p class="text-secondary small">Supervisión comercial y seguimiento de unidades.</p>
+                        <ul class="text-secondary small ps-3 mb-0">
+                            <li><strong>Catálogo Comercial:</strong> Interfaz visual en cuadrícula que muestra las fotografías, especificaciones y precios de exhibición de los vehículos listos para la venta.</li>
+                            <li><strong>Historial de Vehículos:</strong> Muestra una trazabilidad cronológica completa de cada unidad, indicando qué mantenimientos ha recibido, qué talleres la han atendido y quiénes han sido sus propietarios previos.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CAPÍTULO 3: MÓDULO DE ACONDICIONAMIENTO Y TALLERES -->
+        <section class="mb-5">
+            <h2 class="h4 fw-bold text-primary mb-3"><i class="bi bi-tools me-2"></i>Capítulo 3: Módulo de Acondicionamiento (Talleres, mantenimientos,servicios,Compras e insumos)</h2>
+            <p class="text-secondary">Administra los procesos de mantenimiento preventivo y correctivo, los servicios estéticos de limpieza y el abastecimiento corporativo de repuestos e insumos.</p>
+            
+            <div class="p-4 border rounded-3 bg-light">
+                <ul class="text-secondary small ps-3 mb-0">
+                    <li class="mb-3">
+                        <strong>3.1 Mantenimiento de Vehículos :</strong> Controla el ingreso de unidades automotrices a los talleres mecánicos asociados. 
+                        <br><em>Botones y funciones clave:</em> <span class="badge bg-primary">Registrar Mantenimiento</span> (permite seleccionar la placa del vehículo, describir la falla mecánica y asignar el taller o mecánico responsable) y <span class="badge bg-success">Finalizar </span> (cambia el estatus del vehículo de "manteniendo" a "disponible").
+                    </li>
+                    <li class="mb-3">
+                        <strong>3.2 Servicios  :</strong> Administra los servicios de lavado especializado, pulitura de carrocería y limpieza profunda de motores. 
+                        <br><em>Botones y funciones clave:</em> <span class="badge bg-primary">Guardar Servicio</span> (registra el nombre del servicio, la descripción y el costo base aplicable).
+                    </li>
+                    <li class="mb-3">
+                        <strong>3.3 Compras de Accesorios e Insumos :</strong> Controla el reabastecimiento de repuestos y materiales para talleres.
+                        <br><em>Botones y funciones clave:</em> <span class="badge bg-primary">Nueva Compra</span> (permite seleccionar al proveedor registrado mediante su RIF, agregar líneas de productos por cantidades y definir costos) y <span class="badge bg-success">crear compra</span> (actualiza automáticamente las existencias en el inventario físico de la empresa).
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- CAPÍTULO 4: MÓDULO DE VENTAS, CITAS Y PAGOS -->
+        <section class="mb-5">
+            <h2 class="h4 fw-bold text-primary mb-3"><i class="bi bi-cash-stack me-2"></i>Capítulo 4: Módulo de Ventas, Citas y Pagos</h2>
+            <p class="text-secondary">Supervisa las transacciones comerciales, el agendamiento de citas técnicas y la validación de liquidaciones financieras de los clientes.</p>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="p-4 border rounded-3 bg-light h-100">
+                        <h6 class="fw-bold text-dark"><i class="bi bi-calendar-event text-primary me-2"></i>4.1 Gestión de Citas </h6>
+                        <p class="text-secondary small">Administra el calendario de revisiones y mantenimiento solicitado por los usuarios.</p>
+                        <ul class="text-secondary small ps-3 mb-0">
+                            <li><strong>Menús desplegables de estado:</strong> Permiten modificar el estatus de la cita (Pendiente, Aprobada, Cancelada).</li>
+                            <li><span class="badge bg-success">Actualizar Cita</span>: Guarda los cambios en la agenda del concesionario.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 border rounded-3 bg-light h-100">
+                        <h6 class="fw-bold text-dark"><i class="bi bi-cash-coin text-primary me-2"></i>4.2 Venta de Vehículos </h6>
+                        <p class="text-secondary small">Formalización comercial y traspaso de propiedad vehicular.</p>
+                        <ul class="text-secondary small ps-3 mb-0">
+                            <li><strong>Buscadores asíncronos en tiempo real:</strong> Localizan clientes por cédula y vehículos disponibles por placa.</li>
+                            <li><span class="badge bg-primary">Imprimir recibo</span>: Ejecuta la transacción comercial y emite el documento fiscal en formato PDF.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 border rounded-3 bg-light h-100">
+                        <h6 class="fw-bold text-dark"><i class="bi bi-credit-card text-primary me-2"></i>4.3 Gestionar Pagos </h6>
+                        <p class="text-secondary small">Panel de supervisión financiera y contable.</p>
+                        <ul class="text-secondary small ps-3 mb-0">
+                            <li><strong>Tabla de referencias bancarias:</strong> Muestra abonos, montos y comprobantes presentados por los compradores.</li>
+                            <li><span class="badge bg-success">Registrar pago</span>: Da por liquidada la cuota correspondiente y actualiza de inmediato el saldo pendiente del cliente.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CAPÍTULO 5: DIRECTORIO Y GESTIÓN DE USUARIOS -->
+        <section class="mb-5">
+            <h2 class="h4 fw-bold text-primary mb-3"><i class="bi bi-people-fill me-2"></i>Capítulo 5: Directorio y Gestión de Usuarios</h2>
+            <div class="p-4 border rounded-3 bg-light">
+                <p class="text-secondary small">Administra las bases de datos de Propietarios, Clientes, Vendedores y Proveedores del concesionario.</p>
+                <h6 class="fw-bold text-dark mt-3">Gestión de Cuentas del Sistema </h6>
+                <p class="text-secondary small">Permite controlar quiénes tienen acceso web a la plataforma:</p>
+                <ul class="text-secondary small ps-3 mb-0">
+                    <li><span class="badge bg-primary">Crear Usuario</span>: Abre el formulario de alta para asignar número de cédula, nombre completo, correo electrónico, contraseña temporal y rol organizacional (Superusuario, Administrador, Vendedor o Cliente).</li>
+                    <li><span class="badge bg-warning text-dark"><i class="bi bi-pencil"></i> Editar Cuenta</span>: Modifica los parámetros de acceso o datos de perfil de un usuario existente.</li>
+                    <li><span class="badge bg-danger"><i class="bi bi-lock"></i> Inhabilitar Acceso</span>: Restringe inmediatamente los permisos de inicio de sesión a empleados que ya no laboren en la institución.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- CAPÍTULO 6: CONFIGURACIÓN AVANZADA Y SEGURIDAD (EXCLUSIVO SUPERUSUARIO) -->
+        <section class="mb-4">
+            <h2 class="h4 fw-bold text-danger mb-3"><i class="bi bi-gear-fill me-2"></i>Capítulo 6: Configuración Avanzada y Seguridad (Exclusivo Superusuario)</h2>
+            <p class="text-secondary small">Concentra las herramientas más delicadas, técnicas y potentes para la gobernanza absoluta del sistema:</p>
+            
+            <div class="accordion" id="accordionConfig">
+                <!-- Sección 6.1: Permisos y Roles -->
+                <div class="accordion-item border mb-2 rounded-3 overflow-hidden">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button fw-semibold text-dark bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                            <i class="bi bi-shield-lock text-danger me-2"></i> 6.1 Gestión de Permisos y Roles 
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionConfig">
+                        <div class="accordion-body text-secondary small">
+                            <p>Muestra una matriz cruzada que relaciona todos los módulos del sistema frente a los roles organizacionales existentes.</p>
+                            <ul>
+                                <li><strong>Casillas de Verificación (Checkboxes):</strong> Permiten activar o desactivar privilegios específicos de forma granular: <strong>Lectura (p_leer)</strong>, <strong>Creación (p_crear)</strong>, <strong>Actualización (p_actualizar)</strong> y <strong>Eliminación (p_eliminar)</strong>.</li>
+                                <li><span class="badge bg-success">Guardar Permisos</span>: Botón inferior que actualiza al instante las políticas de seguridad evaluadas en tiempo de ejecución por el sistema </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 6.2: Configuración Financiera -->
+                <div class="accordion-item border mb-2 rounded-3 overflow-hidden">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed fw-semibold text-dark bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                            <i class="bi bi-cash-coin text-success me-2"></i> 6.2 Bancos, Métodos de Pago y monedas con las que se van a hacer las ventas
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionConfig">
+                        <div class="accordion-body text-secondary small">
+                            <ul>
+                                <li><span class="badge bg-primary">Agregar Banco</span>: Registra entidades financieras receptoras de fondos corporativos.</li>
+                                <li><strong>Interruptores de Estado:</strong> Activan o desactivan pasarelas de pago y métodos electrónicos visibles para los clientes al momento de cancelar.</li>
+                               
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección 6.3: Auditoría y Mantenimiento -->
+                <div class="accordion-item border rounded-3 overflow-hidden">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed fw-semibold text-dark bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                            <i class="bi bi-database-fill-gear text-danger me-2"></i> 6.3 Bitácora, Reportes y Mantenimiento de Base de Datos 
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionConfig">
+                        <div class="accordion-body text-secondary small">
+                            <ul>
+                                <li><strong>Bitácora del Sistema:</strong> Muestra un registro cronológico de  el nombre de usuario, la acción específica ejecutada y la marca de tiempo exacta de los eventos. 
+                                    <br><em>Filtros de Búsqueda:</em> Permiten acotar la consulta por rangos de fechas y nombres de usuario para investigaciones internas.
+                                </li>
+                                <li><strong>Reportes Estadísticos:</strong> Gráficos interactivos de rendimiento comercial, rotación de inventarios y efectividad de talleres.</li>
+                                <li><span class="badge bg-danger"><i class="bi bi-download"></i> exportar Respaldo (.sql)</span>: Descarga a su equipo una copia exacta de toda la estructura e información de la base de datos para prevenir pérdidas ante fallas técnicas.</li>
+                                <li><span class="badge bg-warning text-dark"><i class="bi bi-upload"></i> ejecutar  importarcion  Base de Datos</span>: Permite cargar un archivo de respaldo previo en situaciones críticas de recuperación del servidor.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pie de página oficial -->
+        <div class="text-center mt-5 pt-4 border-top">
+            <p class="text-muted small mb-0">&copy; 2026 AutoMall - Manual Técnico Oficial Exhaustivo del Superusuario.</p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

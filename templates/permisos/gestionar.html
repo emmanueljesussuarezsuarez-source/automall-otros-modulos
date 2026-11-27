@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<!-- CDN de SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="container mt-5">
+    <h2 class="mb-4">Gestión de Permisos por Rol</h2>
+
+    {# Selector de Roles #}
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form action="{{ url_for('permisos.gestionar') }}" method="GET">
+                <label class="form-label fw-bold">Seleccione el Rol a configurar:</label>
+                <select name="cod_rol" class="form-select shadow-sm" onchange="this.form.submit()">
+                    <option value="">-- Seleccione un rol --</option>
+                    {% for r in roles %}
+                    <option value="{{ r.cod_rol }}" {% if id_rol_seleccionado == r.cod_rol %}selected{% endif %}>
+                        {{ r.nombre_rol }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+    </div>
+
+    {# Matriz Dinámica de Permisos con Modales #}
+    {% if id_rol_seleccionado %}
+    <form id="formPermisos" method="POST" action="{{ url_for('permisos.gestionar') }}">
+        <input type="hidden" name="id_rol_actual" value="{{ id_rol_seleccionado }}">
+        
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-3">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="tablaPermisos" style="width:100%;">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="width: 25%;">Módulo</th>
+                                <th style="width: 55%;">Permisos Activos</th>
+                                <th style="width: 20%;" class="text-end">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for modulo in modulos %}
+                            <tr>
+                                <td class="bg-light fw-bold text-secondary">
+                                    <i class="bi bi-box-seam me-2"></i>{{ modulo.nombre_modulo }}
+                                </td>
+                                
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% set count_activos = namespace(value=0) %}
+                                        
+                                        {% for accion in acciones %}
+                                            {% set id_permiso = modulo.cod_modulo|string + '-' + accion.cod_accion|string %}
+                                            
+                                            {% if id_permiso in permisos_asignados %}
+                                                {% set count_activos.value = count_activos.value + 1 %}
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                                    <i class="bi bi-check-circle me-1"></i>{{ accion.nom_accion }}
+                                                </span>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {% if count_activos.value == 0 %}
+                                            <span class="badge bg-secondary-subtle text-secondary px-2 py-1">
+                                                Sin accesos habilitados
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+
+                                <td class="text-end">
+                                    <button type="button" class="btn btn-sm btn-outline-primary fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalModulo_{{ modulo.cod_modulo }}">
+                                        <i class="bi bi-sliders me-1"></i> Editar Permisos
+                                    </button>
+                                </td>
+                            </tr>
+
+                            {# Modal específico del módulo #}
+                            <div class="modal fade" id="modalModulo_{{ modulo.cod_modulo }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow">
+                                        <div class="modal-header bg-light">
+                                            <h5 class="modal-title fw-bold">
+                                                <i class="bi bi-shield-lock me-2 text-primary"></i>
+                                                Módulo: {{ modulo.nombre_modulo }}
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <p class="text-muted small mb-3">
+                                                Active o desactive las acciones permitidas para este rol en el módulo seleccionado:
+                                            </p>
+                                            <div class="d-flex flex-column gap-3">
+                                                {% for accion in acciones %}
+                                                    {% set id_permiso = modulo.cod_modulo|string + '-' + accion.cod_accion|string %}
+                                                    
+                                                    <div class="form-check form-switch fs-6">
+                                                        <input class="form-check-input" 
+                                                               type="checkbox" 
+                                                               name="permisos_activos" 
+                                                               value="{{ id_permiso }}" 
+                                                               id="permiso_{{ id_permiso }}"
+                                                               {% if id_permiso in permisos_asignados %}checked{% endif %}>
+                                                        <label class="form-check-label text-dark fw-medium" for="permiso_{{ id_permiso }}">
+                                                            {{ accion.nom_accion }}
+                                                        </label>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer bg-light">
+                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                                                Listo / Cerrar
+                                            </button>
+                                            <button type="submit" class="btn btn-primary btn-sm fw-bold">
+                                                <i class="bi bi-save me-1"></i> Guardar Cambios
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-white p-3 border-top-0">
+                <button type="submit" class="btn btn-primary d-flex align-items-center justify-content-center w-100 py-2 shadow-sm fw-bold">
+                    <i class="bi bi-shield-lock-fill me-2"></i> Guardar Cambios de Seguridad
+                </button>
+            </div>
+        </div>
+    </form>
+    {% else %}
+    <div class="alert alert-info border-0 shadow-sm" role="alert">
+        <i class="bi bi-info-circle-fill me-2"></i> Por favor, seleccione un rol del menú superior para ver y editar sus accesos.
+    </div>
+    {% endif %}
+</div>
+
+<script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // 1. Inicialización de DataTables
+        $('#tablaPermisos').DataTable({
+            autoWidth: false,
+            language: {
+                search: "Buscar:",
+                lengthMenu: "Mostrar _MENU_ registros",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                infoEmpty: "Mostrando 0 a 0 de 0 registros",
+                infoFiltered: "(filtrado de _MAX_ registros totales)",
+                zeroRecords: "No se encontraron resultados",
+                paginate: {
+                    first: "Primero",
+                    last: "Último",
+                    next: "Siguiente",
+                    previous: "Anterior"
+                }
+            }
+        });
+
+        // 2. Interceptamos el submit para pedir confirmación con SweetAlert2
+        $('#formPermisos').on('submit', function(e) {
+            e.preventDefault();
+            const form = this;
+
+            Swal.fire({
+                title: '¿Guardar permisos?',
+                text: "Se actualizará la matriz de accesos para este rol.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, aplicar cambios',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit(); // Si confirma, enviamos el formulario normalmente
+                }
+            });
+        });
+    });
+</script>
+
+{# 3. Renderizado automático de los mensajes Flash con SweetAlert2 #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        title: "{{ '¡Éxito!' if category == 'success' else '¡Atención!' }}",
+                        text: "{{ message }}",
+                        icon: "{{ category if category in ['success', 'error', 'warning', 'info'] else 'info' }}",
+                        confirmButtonText: 'Aceptar',
+                        confirmButtonColor: '#0d6efd'
+                    });
+                });
+            </script>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+{% endblock %}

@@ -1,0 +1,13 @@
+@media (max-width: 992px) {
+    #tablaVendedores {
+        font-size: 0.78rem;
+    }
+    #tablaVendedores .btn-sm {
+        padding: 0.15rem 0.35rem;
+        font-size: 0.7rem;
+    }
+    #tablaVendedores th, #tablaVendedores td {
+        padding: 0.35rem 0.25rem;
+        white-space: nowrap;
+    }
+}

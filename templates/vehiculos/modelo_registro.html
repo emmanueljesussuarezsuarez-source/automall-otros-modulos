@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- CDNs de DataTables y jQuery (si no los tenías en base.html) -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        
+        <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+        <div class="col-md-4">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Nuevo Modelo</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form id="formModelo" action="{{ url_for('modelos.registro_modelo') }}" method="POST">
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Marca</label>
+                            <select name="cod_marca" id="cod_marca" class="form-select" required>
+                                <option value="" disabled selected>Seleccione una marca...</option>
+                                {% for marca in marcas %}
+                                    <option value="{{ marca.cod_marca }}">{{ marca.nombre_marca }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nombre del Modelo</label>
+                            <input type="text" name="nombre_modelo" id="nombre_modelo" class="form-control" placeholder="Ej: Corolla..." maxlength="21">
+                        </div>
+                        
+                        <input type="hidden" name="estado" value="Activo">
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success shadow-sm">
+                                <i class="bi bi-save me-1"></i> Guardar Modelo
+                            </button>
+                            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: TABLA DE LISTADO -->
+        <div class="col-md-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Modelos Registrados</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="tablaModelos" class="table table-hover align-middle w-100">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Marca</th>
+                                    <th>Modelo</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for modelo in modelos %}
+                                <tr>
+                                    <td><span class="text-muted fw-bold">{{ modelo.cod_modelo }}</span></td>
+                                    <td class="text-primary fw-bold">{{ modelo.nombre_marca }}</td>
+                                    <td class="fw-bold text-dark">{{ modelo.nombre_modelo }}</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-outline-primary btn-editar" 
+                                            data-id="{{ modelo.cod_modelo }}"
+                                            data-nombre="{{ modelo.nombre_modelo }}"
+                                            data-marca="{{ modelo.cod_marca }}"
+                                            title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        
+                                        <button type="button" class="btn btn-sm btn-outline-danger btn-eliminar-modelo" 
+                                                data-id="{{ modelo.cod_modelo }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL PARA EDITAR MODELO -->
+<div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formEditar" method="POST">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalEditarLabel">Editar Modelo</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Marca</label>
+                        <select name="cod_marca" id="edit_cod_marca" class="form-select" required>
+                            {% for marca in marcas %}
+                                <option value="{{ marca.cod_marca }}">{{ marca.nombre_marca }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nombre del Modelo</label>
+                        <input type="text" name="nombre_modelo" id="edit_nombre_modelo" class="form-control" maxlength="21">
+                    </div>
+                    
+                    <input type="hidden" name="estado" id="edit_estado" value="Activo">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Actualizar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts de jQuery y DataTables -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- SweetAlert2 y Script del Módulo -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ url_for('static', filename='js/modelo.js') }}"></script>
+
+{% endblock %}

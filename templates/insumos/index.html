@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Insumos{% endblock %}
+
+{% block content %}
+<!-- Estilos de DataTables con Bootstrap 5 -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+
+<div class="container-fluid mt-4 px-4">
+
+    <!-- Mensajes Flash ocultos para capturar en insumos.js -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flask-msg-data" data-message="{{ message }}" data-category="{{ category }}" style="display:none;"></div>
+        {% endfor %}
+    {% endwith %}
+
+    <!-- Barra de acciones superior -->
+    <div class="d-flex justify-content-end mb-3 gap-2 flex-wrap">
+        {% if tiene_permiso('Insumos', 'p_crear') %}
+        <a href="{{ url_for('insumos.nuevo') }}" class="btn btn-primary shadow-sm fw-bold">
+            <i class="bi bi-plus-circle me-1"></i> Nuevo Insumo
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Tarjeta idéntica a Mantenimiento y Compras -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-dark text-white p-3 border-0 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold d-flex align-items-center">
+                <i class="bi bi-box-seam me-2 text-primary"></i>
+                Historial de Insumos
+            </h5>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table id="tablaInsumos" class="table table-hover align-middle mb-0 nowrap" style="width:100%;">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="py-3">Código</th>
+                            <th class="py-3">Nombre</th>
+                            <th class="py-3">Descripción</th>
+                            <th class="py-3 text-center">Stock</th>
+                            <th class="py-3 text-center">Estado Stock</th>
+                            <th class="py-3 text-end px-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in insumos %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-dark rounded-2 px-2 py-1 fs-7 font-monospace">
+                                    #{{ i.cod_insumo }}
+                                </span>
+                            </td>
+                            <td class="fw-semibold text-dark">{{ i.nombre_insumo }}</td>
+                            <td class="text-muted">{{ i.descripcion or '-' }}</td>
+                            <td class="text-center font-monospace fw-bold">{{ i.stock }}</td>
+                            <td class="text-center">
+                                {% if i.stock <= 0 %}
+                                    <span class="badge rounded-pill bg-danger px-3">
+                                        <i class="bi bi-x-circle me-1"></i> Agotado
+                                    </span>
+                                {% elif i.stock <= 5 %}
+                                    <span class="badge rounded-pill bg-warning text-dark px-3">
+                                        <i class="bi bi-exclamation-triangle me-1"></i> Bajo Stock
+                                    </span>
+                                {% else %}
+                                    <span class="badge rounded-pill bg-success px-3">
+                                        <i class="bi bi-check-circle me-1"></i> Normal
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-1">
+                                    <!-- Botón Editar Azul igual a Marcas -->
+                                    <button type="button" 
+                                            class="btn btn-outline-primary btn-sm rounded-2" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editModal{{ i.cod_insumo }}"
+                                            title="Editar Insumo">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+
+                                    <!-- Botón Eliminar Rojo igual a Marcas -->
+                                    {% if tiene_permiso('Insumos', 'p_eliminar') %}
+                                    <a href="{{ url_for('insumos.eliminar', cod_insumo=i.cod_insumo) }}" 
+                                       class="btn btn-outline-danger btn-sm rounded-2 btn-eliminar-insumo"
+                                       data-nombre="{{ i.nombre_insumo }}"
+                                       title="Eliminar Insumo">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modales de Edición (Colocados fuera de la tabla para no interferir con DataTables) -->
+{% for i in insumos %}
+<div class="modal fade" id="editModal{{ i.cod_insumo }}" tabindex="-1" aria-labelledby="editModalLabel{{ i.cod_insumo }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white border-0">
+                <h5 class="modal-title fw-bold" id="editModalLabel{{ i.cod_insumo }}">
+                    <i class="bi bi-pencil-square me-2 text-warning"></i>Editar Insumo #{{ i.cod_insumo }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('insumos.editar', cod_insumo=i.cod_insumo) }}">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Nombre del Insumo *</label>
+                        <input type="text" name="nombre" class="form-control" value="{{ i.nombre_insumo }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Descripción</label>
+                        <textarea name="descripcion" class="form-control" rows="2">{{ i.descripcion or '' }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Stock</label>
+                        <input type="number" name="stock" class="form-control" value="{{ i.stock }}" min="0">
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning fw-bold px-4">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Scripts de librerías -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Archivo JavaScript separado -->
+<script src="{{ url_for('static', filename='js/insumos.js') }}"></script>
+{% endblock %}

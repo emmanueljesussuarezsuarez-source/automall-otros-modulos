@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div class="card auth-card border-0 p-2 shadow-sm">
+                <div class="card-body p-4 p-md-5">
+
+                    <!-- Notificaciones Flash Premium con SweetAlert2 -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flask-msg-data" data-message="{{ message }}" data-category="{{ category }}" style="display: none;"></div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+  
+                    <div class="text-center mb-5">
+                        <i class="bi bi-person-badge-fill text-success" style="font-size: 3rem;"></i>
+                        <h2 class="fw-bold text-dark mt-3">Registro de Clientes</h2>
+                        <p class="text-muted">Crea tu cuenta en AutoMall para gestionar tus citas de revisión y compras.</p>
+                    </div>
+
+                    <!-- El action se deja vacío para que submitte al endpoint actual (/registrar_clientes) -->
+                    <form action="" method="POST" enctype="multipart/form-data" class="row g-4 needs-validation" id="form-registro" novalidate>
+                        
+                        <!-- Sección Carga de Foto de Perfil (Opcional) -->
+                        <div class="col-12 text-center mb-4">
+                            <h6 class="text-success fw-bold text-uppercase small ls-1">Foto de Perfil (Opcional)</h6>
+                            <hr class="mt-1 mb-3 opacity-25">
+                            <div class="d-flex justify-content-center">
+                                <div class="position-relative">
+                                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center shadow-sm border" style="width: 130px; height: 130px; overflow: hidden; border: 3px solid #fff !important;">
+                                        <i class="bi bi-camera-fill text-muted fs-1" id="preview-icon"></i>
+                                        <img id="img-preview" src="#" class="d-none w-100 h-100 object-fit-cover">
+                                    </div>
+                                    <label for="foto_perfil" class="btn btn-success btn-sm rounded-circle position-absolute bottom-0 end-0 shadow-sm d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; cursor: pointer;">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </label>
+                                    <input type="file" name="foto_perfil" id="foto_perfil" class="d-none" accept="image/*" onchange="previewImage(this)">
+                                </div>
+                            </div>
+                            <div class="form-text mt-2 text-center" id="foto-error-msg">Haz clic en el botón verde para subir tu foto.</div>
+                        </div>
+
+                        <div class="col-12">
+                            <h6 class="text-success fw-bold text-uppercase small ls-1">Datos de Identidad</h6>
+                            <hr class="mt-1 mb-3 opacity-25">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Cédula de Identidad</label>
+                            <input type="text" name="cedula" id="cedula" class="form-control" placeholder="Ej: 12345678" maxlength="10" value="{{ request.form.get('cedula', '') }}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Nombre</label>
+                            <input type="text" name="nombre" id="nombre" class="form-control" value="{{ request.form.get('nombre', '') }}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Apellido</label>
+                            <input type="text" name="apellido" id="apellido" class="form-control" value="{{ request.form.get('apellido', '') }}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Teléfono de Contacto</label>
+                            <input type="text" name="telefono" id="telefono" class="form-control" placeholder="04000000000" maxlength="11" value="{{ request.form.get('telefono', '') }}" required>
+                        </div>
+
+                        <div class="col-12">
+                            <h6 class="text-success fw-bold text-uppercase small ls-1">Contacto y Ubicación</h6>
+                            <hr class="mt-1 mb-3 opacity-25">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Dirección de Residencia</label>
+                            <input type="text" name="direccion" id="direccion" class="form-control" value="{{ request.form.get('direccion', '') }}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Correo Electrónico</label>
+                            <input type="email" name="email" id="email" class="form-control" value="{{ request.form.get('email', '') }}" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Contraseña Segura</label>
+                            <input type="password" name="password" id="password" class="form-control" required>
+                        </div>
+
+                        <div class="col-12 mt-5">
+                            <button type="submit" class="btn btn-success w-100 shadow-sm py-3 fw-bold">
+                                <i class="bi bi-person-plus-fill me-2"></i>Registrarme como Cliente
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ url_for('static', filename='js/registro.js') }}"></script>
+{% endblock %}

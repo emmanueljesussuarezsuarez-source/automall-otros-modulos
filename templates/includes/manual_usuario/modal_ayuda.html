@@ -1,0 +1,1183 @@
+<!-- Modal del Centro de Ayuda y Manual Interactivo AutoMall -->
+<div class="modal fade" 
+     id="modalCentroAyuda" 
+     tabindex="-1" 
+     aria-labelledby="modalCentroAyudaTitulo" 
+     aria-hidden="true" 
+     role="dialog">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <!-- Encabezado del Modal -->
+            <div class="modal-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="modal-title" id="modalCentroAyudaTitulo">
+                        <i class="bi bi-compass-fill text-primary me-2"></i>Centro de Ayuda y Manual Interactivo
+                    </h5>
+                    <p class="modal-subtitle">
+                        Selecciona un módulo del sistema para consultar su propósito o recibir una visita guiada interactiva.
+                    </p>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar ventana de ayuda"></button>
+            </div>
+
+            <!-- Cuerpo del Modal -->
+            <div class="modal-body">
+                <!-- Barra de Búsqueda Interactiva -->
+                <div class="centro-ayuda-search-wrapper">
+                    <i class="bi bi-search search-icon" aria-hidden="true"></i>
+                    <input type="search" 
+                           id="inputBuscarModulo" 
+                           class="centro-ayuda-search-input" 
+                           placeholder="Buscar módulo por nombre, función o categoría (ej: taller, clientes, ventas)..." 
+                           aria-label="Buscar módulo en el manual"
+                           autocomplete="off">
+                    <button type="button" id="btnLimpiarBusqueda" class="centro-ayuda-search-clear" aria-label="Limpiar búsqueda" title="Limpiar búsqueda">
+                        <i class="bi bi-x-circle-fill"></i>
+                    </button>
+                </div>
+
+                <!-- Píldoras de Filtro por Categoría -->
+                <div class="centro-ayuda-categories" role="tablist" aria-label="Filtro de módulos por categoría">
+                    <button type="button" class="centro-ayuda-cat-btn active" data-categoria="todas">
+                        <i class="bi bi-grid-fill"></i> Todos <span class="badge-count" id="countTodas">0</span>
+                    </button>
+                    <button type="button" class="centro-ayuda-cat-btn" data-categoria="acondicionamiento">
+                        <i class="bi bi-tools"></i> Acondicionamiento <span class="badge-count" id="countAcondicionamiento">0</span>
+                    </button>
+                    <button type="button" class="centro-ayuda-cat-btn" data-categoria="operaciones">
+                        <i class="bi bi-car-front-fill"></i> Operaciones <span class="badge-count" id="countOperaciones">0</span>
+                    </button>
+                    <button type="button" class="centro-ayuda-cat-btn" data-categoria="ventas">
+                        <i class="bi bi-cash-stack"></i> Ventas & Citas <span class="badge-count" id="countVentas">0</span>
+                    </button>
+                    <button type="button" class="centro-ayuda-cat-btn" data-categoria="usuarios">
+                        <i class="bi bi-people-fill"></i> Usuarios <span class="badge-count" id="countUsuarios">0</span>
+                    </button>
+                    <button type="button" class="centro-ayuda-cat-btn" data-categoria="configuracion">
+                        <i class="bi bi-gear-fill"></i> Configuración <span class="badge-count" id="countConfiguracion">0</span>
+                    </button>
+                    <button type="button" class="centro-ayuda-cat-btn" data-categoria="general">
+                        <i class="bi bi-person-circle"></i> Mi Cuenta & Inicio <span class="badge-count" id="countGeneral">0</span>
+                    </button>
+                </div>
+
+                <!-- Grícula de Tarjetas de Módulos Autorizados -->
+                <div class="centro-ayuda-grid" id="gridModulosAyuda">
+
+                    <!-- 1. Inicio / Tablero -->
+                    <article class="centro-ayuda-card cat-general" data-categoria="general" data-modulo="inicio">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-house-door-fill"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Inicio</span>
+                                    <h6 class="centro-ayuda-card-title">Portal Principal</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Punto de bienvenida al sistema AutoMall. Accede a vehículos destacados, buscador rápido y accesos directos principales.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="inicio" data-subtour="general" data-url="{{ url_for('index') }}" data-nombre="Inicio: Conocer Portal" title="Recorrido de bienvenida">
+                                    <i class="bi bi-info-circle"></i> Conocer
+                                </button>
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('index') }}" class="centro-ayuda-btn-link" title="Ir a Inicio"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="inicio" data-subtour="general" data-url="{{ url_for('index') }}" data-nombre="Inicio">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- 2. Taller de Vehículos -->
+                    {% if tiene_permiso('Taller', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-acondicionamiento" data-categoria="acondicionamiento" data-modulo="taller">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-building"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Acondicionamiento</span>
+                                    <h6 class="centro-ayuda-card-title">Taller de Vehículos</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Gestión de talleres aliados: registro de establecimientos, edición de datos de contacto y administración lógica de estados.
+                            </p>
+
+                            <!-- Subtours específicos de Taller -->
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="taller" data-subtour="general" data-url="/taller" data-nombre="Taller: Conocer Módulo" title="Visión general del inventario">
+                                    <i class="bi bi-info-circle"></i> Conocer
+                                </button>
+                                {% if tiene_permiso('Taller', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="taller" data-subtour="registro" data-url="/taller" data-nombre="Taller: Registrar" title="Cómo usar el formulario de registro">
+                                    <i class="bi bi-plus-circle"></i> Registrar
+                                </button>
+                                {% endif %}
+                                {% if tiene_permiso('Taller', 'p_actualizar') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="taller" data-subtour="edicion" data-url="/taller" data-nombre="Taller: Editar" title="Cómo usar el formulario de edición">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> 3 Recorridos</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="/taller" class="centro-ayuda-btn-link" title="Ir al listado de Talleres"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="taller" data-subtour="general" data-url="/taller" data-nombre="Taller">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 3. Mantenimiento Operacional -->
+                    {% if tiene_permiso('mantenimiento_operacional', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-acondicionamiento" data-categoria="acondicionamiento" data-modulo="mantenimiento_operacional">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-wrench-adjustable"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Acondicionamiento</span>
+                                    <h6 class="centro-ayuda-card-title">Mantenimiento Operacional</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Control de órdenes de mantenimiento automotriz, asignación de taller, estados de reparación, costos finales y reportes descargables.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="mantenimiento_operacional" data-subtour="general" data-url="{{ url_for('mantenimiento_operacional.listar_mantenimiento') }}" data-nombre="Mantenimiento: Conocer Módulo" title="Visión general de órdenes">
+                                    <i class="bi bi-info-circle"></i> Conocer
+                                </button>
+                                {% if tiene_permiso('mantenimiento_operacional', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="mantenimiento_operacional" data-subtour="registro" data-url="{{ url_for('mantenimiento_operacional.crear_mantenimiento') }}" data-nombre="Mantenimiento: Registrar" title="Cómo registrar órdenes de mantenimiento">
+                                    <i class="bi bi-plus-circle"></i> Registrar
+                                </button>
+                                {% endif %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="mantenimiento_operacional" data-subtour="acciones_reporte" data-url="{{ url_for('mantenimiento_operacional.listar_mantenimiento') }}" data-nombre="Mantenimiento: Reportes y Recibos" title="Reportes PDF y comprobantes">
+                                    <i class="bi bi-file-earmark-text"></i> Reportes
+                                </button>
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Recorridos listos</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('mantenimiento_operacional.listar_mantenimiento') }}" class="centro-ayuda-btn-link" title="Ir a Mantenimiento"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="mantenimiento_operacional" data-subtour="general" data-url="{{ url_for('mantenimiento_operacional.listar_mantenimiento') }}" data-nombre="Mantenimiento Operacional">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 4. Servicios de Vehículos -->
+                    {% if tiene_permiso('servicios', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-acondicionamiento" data-categoria="acondicionamiento" data-modulo="servicios">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-car-front-fill"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Acondicionamiento</span>
+                                    <h6 class="centro-ayuda-card-title">Servicios Técnicos</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Catálogo y ejecución de servicios para vehículos: cotización base, finalización de trabajos técnicos y emisión de comprobantes digitales.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="servicios" data-subtour="general" data-url="{{ url_for('servicios.listar_servicios') }}" data-nombre="Servicios: Conocer Módulo" title="Visión general de servicios">
+                                    <i class="bi bi-info-circle"></i> Conocer
+                                </button>
+                                {% if tiene_permiso('servicios', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="servicios" data-subtour="registro" data-url="{{ url_for('servicios.crear_servicio') }}" data-nombre="Servicios: Registrar" title="Cómo registrar servicios técnicos">
+                                    <i class="bi bi-plus-circle"></i> Registrar
+                                </button>
+                                {% endif %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="servicios" data-subtour="finalizar_reporte" data-url="{{ url_for('servicios.listar_servicios') }}" data-nombre="Servicios: Recibos y Reportes" title="Emisión de comprobantes y reportes">
+                                    <i class="bi bi-file-earmark-text"></i> Recibos
+                                </button>
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Recorridos listos</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('servicios.listar_servicios') }}" class="centro-ayuda-btn-link" title="Ir a Servicios"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="servicios" data-subtour="general" data-url="{{ url_for('servicios.listar_servicios') }}" data-nombre="Servicios">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 5. Compras de Accesorios -->
+                    {% if tiene_permiso('Compras', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-acondicionamiento" data-categoria="acondicionamiento" data-modulo="compras">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-bag-check-fill"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Acondicionamiento</span>
+                                    <h6 class="centro-ayuda-card-title">Compras de Accesorios</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Registro y seguimiento de adquisiciones de accesorios y repuestos automotrices con proveedores comerciales.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="compras" data-subtour="general" data-url="{{ url_for('compras.listar') }}" data-nombre="Compras: Conocer" title="Historial de compras">
+                                    <i class="bi bi-info-circle"></i> Conocer
+                                </button>
+                                {% if tiene_permiso('Compras', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="compras" data-subtour="registro" data-url="{{ url_for('compras.nueva') }}" data-nombre="Compras: Registrar" title="Cómo ingresar compras">
+                                    <i class="bi bi-plus-circle"></i> Registrar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('compras.listar') }}" class="centro-ayuda-btn-link" title="Ir a Compras"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="compras" data-subtour="general" data-url="{{ url_for('compras.listar') }}" data-nombre="Compras">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 6. Insumos de Vehículos -->
+                    {% if tiene_permiso('Insumos', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-acondicionamiento" data-categoria="acondicionamiento" data-modulo="insumos">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-box-seam-fill"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Acondicionamiento</span>
+                                    <h6 class="centro-ayuda-card-title">Insumos de Vehículos</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Control de existencias e inventario de insumos y materiales utilizados en el mantenimiento de la flota.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="insumos" data-subtour="general" data-url="{{ url_for('insumos.listar') }}" data-nombre="Insumos: Control de Stock" title="Inventario de insumos">
+                                    <i class="bi bi-info-circle"></i> Stock
+                                </button>
+                                {% if tiene_permiso('Insumos', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="insumos" data-subtour="registro" data-url="{{ url_for('insumos.nuevo') }}" data-nombre="Insumos: Registrar Insumo" title="Formulario de alta de insumo">
+                                    <i class="bi bi-plus-circle"></i> Registrar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('insumos.listar') }}" class="centro-ayuda-btn-link" title="Ir a Insumos"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="insumos" data-subtour="general" data-url="{{ url_for('insumos.listar') }}" data-nombre="Insumos">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 7. Inventario de Vehículos -->
+                    {% if tiene_permiso('Vehiculos', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-operaciones" data-categoria="operaciones" data-modulo="vehiculos">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-car-front"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Operaciones</span>
+                                    <h6 class="centro-ayuda-card-title">Inventario de Vehículos</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Registro general de unidades, galerías de fotografías, ficha técnica, kilometraje, año y estados operativos.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="vehiculos" data-subtour="general" data-url="{{ url_for('vehiculos.lista') }}" data-nombre="Vehículos: Conocer Inventario" title="Listado y estados">
+                                    <i class="bi bi-info-circle"></i> Conocer
+                                </button>
+                                {% if tiene_permiso('Vehiculos', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="vehiculos" data-subtour="registro" data-url="{{ url_for('vehiculos.registro') }}" data-nombre="Vehículos: Registrar Unidad" title="Ingreso y documentación">
+                                    <i class="bi bi-plus-circle"></i> Registrar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Recorridos listos</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('vehiculos.lista') }}" class="centro-ayuda-btn-link" title="Ir a Vehículos"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="vehiculos" data-subtour="general" data-url="{{ url_for('vehiculos.lista') }}" data-nombre="Vehículos">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 8. Catálogo de Vehículos -->
+                    {% if tiene_permiso('Catalogo', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-operaciones" data-categoria="operaciones" data-modulo="catalogo">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-grid-fill"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Operaciones</span>
+                                    <h6 class="centro-ayuda-card-title">Catálogo Comercial</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Escaparate comercial de vehículos con filtros avanzados por marca, modelo, rango de precio y características.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="catalogo" data-subtour="general" data-url="{{ url_for('catalogo.listar') }}" data-nombre="Catálogo: Exploración Comercial" title="Precios y fichas">
+                                    <i class="bi bi-search"></i> Explorar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('catalogo.listar') }}" class="centro-ayuda-btn-link" title="Ir a Catálogo"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="catalogo" data-subtour="general" data-url="{{ url_for('catalogo.listar') }}" data-nombre="Catálogo">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 9. Marcas -->
+                    {% if tiene_permiso('Marca', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-operaciones" data-categoria="operaciones" data-modulo="marcas">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-tag-fill"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Operaciones</span>
+                                    <h6 class="centro-ayuda-card-title">Marcas de Vehículos</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Gestión del catálogo de fabricantes y marcas vehiculares autorizadas en el ecosistema AutoMall.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="marcas" data-subtour="general" data-url="{{ url_for('marcas.registro_marca') }}" data-nombre="Marcas: Gestión y Registro" title="Fabricantes">
+                                    <i class="bi bi-tag"></i> Gestión
+                                </button>
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('marcas.registro_marca') }}" class="centro-ayuda-btn-link" title="Ir a Marcas"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="marcas" data-subtour="general" data-url="{{ url_for('marcas.registro_marca') }}" data-nombre="Marcas">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 10. Modelos -->
+                    {% if tiene_permiso('Modelo', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-operaciones" data-categoria="operaciones" data-modulo="modelos">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-diagram-3-fill"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Operaciones</span>
+                                    <h6 class="centro-ayuda-card-title">Modelos de Vehículos</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Registro y vinculación de modelos específicos asociados a las distintas marcas del catálogo.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="modelos" data-subtour="general" data-url="{{ url_for('modelos.registro_modelo') }}" data-nombre="Modelos: Gestión y Registro" title="Modelos">
+                                    <i class="bi bi-diagram-3"></i> Gestión
+                                </button>
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('modelos.registro_modelo') }}" class="centro-ayuda-btn-link" title="Ir a Modelos"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="modelos" data-subtour="general" data-url="{{ url_for('modelos.registro_modelo') }}" data-nombre="Modelos">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 11. Historial de Vehículos -->
+                    {% if tiene_permiso('Vehiculos', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-operaciones" data-categoria="operaciones" data-modulo="historial_vehiculos">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-clock-history"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Operaciones</span>
+                                    <h6 class="centro-ayuda-card-title">Historial de Flota</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Auditoría de transiciones y movimientos históricos experimentados por cada vehículo de la flota.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="historial_vehiculos" data-subtour="general" data-url="{{ url_for('vehiculos.historial') }}" data-nombre="Historial: Trazabilidad" title="Movimientos">
+                                    <i class="bi bi-clock-history"></i> Trazabilidad
+                                </button>
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('vehiculos.historial') }}" class="centro-ayuda-btn-link" title="Ir a Historial"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="historial_vehiculos" data-subtour="general" data-url="{{ url_for('vehiculos.historial') }}" data-nombre="Historial de Vehículos">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 12. Gestión de Citas -->
+                    {% if tiene_permiso('Citas', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-ventas" data-categoria="ventas" data-modulo="citas">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-calendar-event-fill"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Ventas & Citas</span>
+                                    <h6 class="centro-ayuda-card-title">Gestión de Citas</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Programación, seguimiento de citas con clientes, estados de confirmación e inspección física de vehículos.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="citas" data-subtour="general" data-url="{{ url_for('citas.consultar') }}" data-nombre="Citas: Consultar Agenda" title="Listado de citas">
+                                    <i class="bi bi-info-circle"></i> Conocer
+                                </button>
+                                {% if tiene_permiso('Citas', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="citas" data-subtour="agendar" data-url="{{ url_for('citas.agendar') }}" data-nombre="Citas: Agendar Nueva Cita" title="Cómo programar citas">
+                                    <i class="bi bi-plus-circle"></i> Agendar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Recorridos listos</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('citas.consultar') }}" class="centro-ayuda-btn-link" title="Ir a Citas"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="citas" data-subtour="general" data-url="{{ url_for('citas.consultar') }}" data-nombre="Citas">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 13. Venta de Vehículos -->
+                    {% if tiene_permiso('Ventas', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-ventas" data-categoria="ventas" data-modulo="ventas">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-cash-stack"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Ventas & Citas</span>
+                                    <h6 class="centro-ayuda-card-title">Venta de Vehículos</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Registro comercial de ventas, control de modalidades (contado/crédito), cálculo de deudas y abonos pendientes.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="ventas" data-subtour="general" data-url="{{ url_for('ventas.listado_ventas') }}" data-nombre="Ventas: Historial de Operaciones" title="Ventas y saldos">
+                                    <i class="bi bi-info-circle"></i> Conocer
+                                </button>
+                                {% if tiene_permiso('Ventas', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="ventas" data-subtour="registro" data-url="{{ url_for('ventas.vista_registro') }}" data-nombre="Ventas: Registrar Venta" title="Facturación y cuotas">
+                                    <i class="bi bi-plus-circle"></i> Facturar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Recorridos listos</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('ventas.listado_ventas') }}" class="centro-ayuda-btn-link" title="Ir a Ventas"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="ventas" data-subtour="general" data-url="{{ url_for('ventas.listado_ventas') }}" data-nombre="Ventas">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 14. Gestión de Pagos (Resuelve admin o usuario según permiso real) -->
+                    {% if tiene_permiso('Pagosadmin', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-ventas" data-categoria="ventas" data-modulo="pagos">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-credit-card-fill"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Ventas & Citas</span>
+                                    <h6 class="centro-ayuda-card-title">Gestión de Pagos (Admin)</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Panel administrativo de conciliación: verificación de comprobantes, aprobación o rechazo de abonos bancarios.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="pagos" data-subtour="general" data-url="{{ url_for('pagos.listar_pagos_admin') }}" data-nombre="Pagos: Conciliación de Abonos" title="Monitoreo de pagos">
+                                    <i class="bi bi-credit-card"></i> Conciliación
+                                </button>
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('pagos.listar_pagos_admin') }}" class="centro-ayuda-btn-link" title="Ir a Pagos Admin"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="pagos" data-subtour="general" data-url="{{ url_for('pagos.listar_pagos_admin') }}" data-nombre="Pagos">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% elif tiene_permiso('Pagos', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-ventas" data-categoria="ventas" data-modulo="pagos">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-credit-card-fill"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Ventas & Citas</span>
+                                    <h6 class="centro-ayuda-card-title">Mis Pagos y Abonos</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Consulta de pagos realizados, estatus de validación y registro de nuevos comprobantes de abono.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="pagos" data-subtour="general" data-url="{{ url_for('pagos.listar_pagos') }}" data-nombre="Mis Pagos: Consulta y Abonos" title="Mis abonos">
+                                    <i class="bi bi-credit-card"></i> Mis Abonos
+                                </button>
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('pagos.listar_pagos') }}" class="centro-ayuda-btn-link" title="Ir a Mis Pagos"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="pagos" data-subtour="general" data-url="{{ url_for('pagos.listar_pagos') }}" data-nombre="Mis Pagos">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 15. Clientes -->
+                    {% if tiene_permiso('Clientes', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-usuarios" data-categoria="usuarios" data-modulo="clientes">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-people-fill"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Usuarios</span>
+                                    <h6 class="centro-ayuda-card-title">Clientes</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Directorio y fichas de clientes: datos de contacto, teléfono, dirección física y opciones de edición rápida.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="clientes" data-subtour="general" data-url="{{ url_for('clientes.listar_clientes') }}" data-nombre="Clientes: Directorio" title="Fichas de clientes">
+                                    <i class="bi bi-people"></i> Directorio
+                                </button>
+                                {% if tiene_permiso('Clientes', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="clientes" data-subtour="registro" data-url="{{ url_for('clientes.registrar_clientes') }}" data-nombre="Clientes: Registrar Cliente" title="Formulario de nuevo cliente">
+                                    <i class="bi bi-plus-circle"></i> Registrar
+                                </button>
+                                {% endif %}
+                                {% if tiene_permiso('Clientes', 'p_actualizar') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="clientes" data-subtour="edicion" data-url="{{ url_for('clientes.listar_clientes') }}" data-nombre="Clientes: Editar Cliente" title="Modificar datos en modal">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('clientes.listar_clientes') }}" class="centro-ayuda-btn-link" title="Ir a Clientes"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="clientes" data-subtour="general" data-url="{{ url_for('clientes.listar_clientes') }}" data-nombre="Clientes">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 16. Propietarios -->
+                    {% if tiene_permiso('Proveedor', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-usuarios" data-categoria="usuarios" data-modulo="propietarios">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-person-badge-fill"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Usuarios</span>
+                                    <h6 class="centro-ayuda-card-title">Propietarios</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Gestión de propietarios y consignatarios que confían sus unidades vehiculares para la intermediación comercial.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="propietarios" data-subtour="general" data-url="{{ url_for('propietarios.lista') }}" data-nombre="Propietarios: Listado" title="Consignatarios">
+                                    <i class="bi bi-person-badge"></i> Listado
+                                </button>
+                                {% if tiene_permiso('Proveedor', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="propietarios" data-subtour="registro" data-url="{{ url_for('propietarios.registro') }}" data-nombre="Propietarios: Registrar" title="Alta de propietarios">
+                                    <i class="bi bi-plus-circle"></i> Registrar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('propietarios.lista') }}" class="centro-ayuda-btn-link" title="Ir a Propietarios"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="propietarios" data-subtour="general" data-url="{{ url_for('propietarios.lista') }}" data-nombre="Propietarios">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 17. Vendedores -->
+                    {% if tiene_permiso('Vendedor', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-usuarios" data-categoria="usuarios" data-modulo="vendedores">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-person-vcard-fill"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Usuarios</span>
+                                    <h6 class="centro-ayuda-card-title">Vendedores</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Padrón del equipo comercial: seguimiento de asesores de ventas, comisiones y rendimiento operativo.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="vendedores" data-subtour="general" data-url="{{ url_for('vendedor.listar') }}" data-nombre="Vendedores: Equipo Comercial" title="Asesores">
+                                    <i class="bi bi-person-vcard"></i> Asesores
+                                </button>
+                                {% if tiene_permiso('Vendedor', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="vendedores" data-subtour="registro" data-url="{{ url_for('vendedor.listar') }}" data-nombre="Vendedores: Registrar Asesor" title="Formulario modal de vendedor">
+                                    <i class="bi bi-plus-circle"></i> Registrar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('vendedor.listar') }}" class="centro-ayuda-btn-link" title="Ir a Vendedores"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="vendedores" data-subtour="general" data-url="{{ url_for('vendedor.listar') }}" data-nombre="Vendedores">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 18. Proveedores -->
+                    {% if tiene_permiso('Compras', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-usuarios" data-categoria="usuarios" data-modulo="proveedores">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-building"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Usuarios</span>
+                                    <h6 class="centro-ayuda-card-title">Proveedores</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Registro de casas comerciales y empresas proveedoras de repuestos, lubricantes y accesorios.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="proveedores" data-subtour="general" data-url="{{ url_for('compras.listar_proveedores') }}" data-nombre="Proveedores: Directorio Comercial" title="Empresas aliadas">
+                                    <i class="bi bi-building"></i> Directorio
+                                </button>
+                                {% if tiene_permiso('Compras', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="proveedores" data-subtour="registro" data-url="{{ url_for('compras.nuevo_proveedor') }}" data-nombre="Proveedores: Registrar" title="Alta comercial de proveedor">
+                                    <i class="bi bi-plus-circle"></i> Registrar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('compras.listar_proveedores') }}" class="centro-ayuda-btn-link" title="Ir a Proveedores"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="proveedores" data-subtour="general" data-url="{{ url_for('compras.listar_proveedores') }}" data-nombre="Proveedores">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 19. Gestión de Usuarios -->
+                    {% if tiene_permiso('Usuarios', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-usuarios" data-categoria="usuarios" data-modulo="usuarios">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-person-gear"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Usuarios</span>
+                                    <h6 class="centro-ayuda-card-title">Gestión de Usuarios</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Creación y control de cuentas de acceso al sistema, asignación de roles de seguridad y activación/inactivación.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="usuarios" data-subtour="general" data-url="{{ url_for('user.listar') }}" data-nombre="Usuarios: Cuentas y Accesos" title="Administración de cuentas">
+                                    <i class="bi bi-person-gear"></i> Cuentas
+                                </button>
+                                {% if tiene_permiso('Usuarios', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="usuarios" data-subtour="registro" data-url="{{ url_for('user.listar') }}" data-nombre="Usuarios: Registrar Cuenta" title="Formulario modal de nuevo usuario">
+                                    <i class="bi bi-plus-circle"></i> Registrar
+                                </button>
+                                {% endif %}
+                                {% if tiene_permiso('Usuarios', 'p_actualizar') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="usuarios" data-subtour="edicion" data-url="{{ url_for('user.listar') }}" data-nombre="Usuarios: Modificar Cuenta" title="Edición modal de usuario">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('user.listar') }}" class="centro-ayuda-btn-link" title="Ir a Usuarios"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="usuarios" data-subtour="general" data-url="{{ url_for('user.listar') }}" data-nombre="Usuarios">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 20. Gestión de Permisos -->
+                    {% if tiene_permiso('Permisos', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-configuracion" data-categoria="configuracion" data-modulo="permisos">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-shield-lock-fill"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Configuración</span>
+                                    <h6 class="centro-ayuda-card-title">Gestión de Permisos</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Matriz de control de accesos granulares: asignación de permisos de creación, lectura, actualización y borrado por rol.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="permisos" data-subtour="general" data-url="{{ url_for('permisos.gestionar') }}" data-nombre="Permisos: Matriz por Rol" title="Matriz RBAC">
+                                    <i class="bi bi-shield-lock"></i> Matriz
+                                </button>
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('permisos.gestionar') }}" class="centro-ayuda-btn-link" title="Ir a Permisos"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="permisos" data-subtour="general" data-url="{{ url_for('permisos.gestionar') }}" data-nombre="Permisos">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 21. Gestión de Roles -->
+                    {% if tiene_permiso('Roles', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-configuracion" data-categoria="configuracion" data-modulo="roles">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-shield-shaded"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Configuración</span>
+                                    <h6 class="centro-ayuda-card-title">Gestión de Roles</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Definición de perfiles y jerarquías organizacionales dentro de AutoMall (Superusuario, Administrador, Vendedor, etc.).
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="roles" data-subtour="general" data-url="{{ url_for('roles_crud.gestion_roles') }}" data-nombre="Roles: Padrón y Funciones" title="Jerarquías">
+                                    <i class="bi bi-shield-shaded"></i> Roles
+                                </button>
+                                {% if tiene_permiso('Roles', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="roles" data-subtour="registro" data-url="{{ url_for('roles_crud.gestion_roles') }}" data-nombre="Roles: Registrar Nuevo Rol" title="Creación de roles en modal">
+                                    <i class="bi bi-plus-circle"></i> Registrar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('roles_crud.gestion_roles') }}" class="centro-ayuda-btn-link" title="Ir a Roles"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="roles" data-subtour="general" data-url="{{ url_for('roles_crud.gestion_roles') }}" data-nombre="Roles">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 22. Módulos y Acciones -->
+                    {% if tiene_permiso('Modulos', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-configuracion" data-categoria="configuracion" data-modulo="modulos_acciones">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-grid-3x3-gap-fill"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Configuración</span>
+                                    <h6 class="centro-ayuda-card-title">Módulos y Acciones</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Catálogo técnico de módulos del sistema y acciones estándar registradas en la arquitectura.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="modulos_acciones" data-subtour="general" data-url="{{ url_for('config_crud.gestion_configuracion') }}" data-nombre="Módulos: Catálogo Técnico" title="Módulos y acciones">
+                                    <i class="bi bi-grid-3x3-gap"></i> Catálogo
+                                </button>
+                                {% if tiene_permiso('Modulos', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="modulos_acciones" data-subtour="registro_modulo" data-url="{{ url_for('config_crud.gestion_configuracion') }}" data-nombre="Módulos: Registrar Módulo" title="Alta técnica de módulo">
+                                    <i class="bi bi-plus-circle"></i> Nuevo Módulo
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('config_crud.gestion_configuracion') }}" class="centro-ayuda-btn-link" title="Ir a Módulos"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="modulos_acciones" data-subtour="general" data-url="{{ url_for('config_crud.gestion_configuracion') }}" data-nombre="Módulos y Acciones">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 23. Métodos de Pago -->
+                    {% if tiene_permiso('Metodo', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-configuracion" data-categoria="configuracion" data-modulo="metodos_pago">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-wallet2"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Configuración</span>
+                                    <h6 class="centro-ayuda-card-title">Métodos de Pago</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Configuración de formas de cobro admitidas en la empresa (Pago Móvil, Transferencias, Divisas en Efectivo, Zelle).
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="metodos_pago" data-subtour="general" data-url="{{ url_for('metodos_pago_crud.gestion_metodos') }}" data-nombre="Métodos: Formas de Pago" title="Modalidades de cobro">
+                                    <i class="bi bi-wallet2"></i> Formas de Pago
+                                </button>
+                                {% if tiene_permiso('Metodo', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="metodos_pago" data-subtour="registro" data-url="{{ url_for('metodos_pago_crud.gestion_metodos') }}" data-nombre="Métodos: Registrar Modalidad" title="Nuevo método de cobro en modal">
+                                    <i class="bi bi-plus-circle"></i> Registrar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('metodos_pago_crud.gestion_metodos') }}" class="centro-ayuda-btn-link" title="Ir a Métodos de Pago"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="metodos_pago" data-subtour="general" data-url="{{ url_for('metodos_pago_crud.gestion_metodos') }}" data-nombre="Métodos de Pago">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 24. Bancos -->
+                    {% if tiene_permiso('Bancos', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-configuracion" data-categoria="configuracion" data-modulo="bancos">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-bank"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Configuración</span>
+                                    <h6 class="centro-ayuda-card-title">Gestión de Bancos</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Catálogo de instituciones bancarias receptoras asociadas a las cuentas oficiales de la empresa.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="bancos" data-subtour="general" data-url="{{ url_for('bancos_crud.gestion_bancos') }}" data-nombre="Bancos: Entidades Receptoras" title="Instituciones bancarias">
+                                    <i class="bi bi-bank"></i> Bancos
+                                </button>
+                                {% if tiene_permiso('Bancos', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="bancos" data-subtour="registro" data-url="{{ url_for('bancos_crud.gestion_bancos') }}" data-nombre="Bancos: Registrar Entidad" title="Nuevo banco receptor en modal">
+                                    <i class="bi bi-plus-circle"></i> Registrar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('bancos_crud.gestion_bancos') }}" class="centro-ayuda-btn-link" title="Ir a Bancos"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="bancos" data-subtour="general" data-url="{{ url_for('bancos_crud.gestion_bancos') }}" data-nombre="Bancos">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 25. Monedas -->
+                    {% if tiene_permiso('Monedas', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-configuracion" data-categoria="configuracion" data-modulo="monedas">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-cash-coin"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Configuración</span>
+                                    <h6 class="centro-ayuda-card-title">Gestión de Monedas</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Unidades monetarias registradas en AutoMall y tasas cambiarias de conversión operativa.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="monedas" data-subtour="general" data-url="{{ url_for('moneda_crud.gestion_monedas') }}" data-nombre="Monedas: Divisas y Tasas" title="Unidades monetarias">
+                                    <i class="bi bi-cash-coin"></i> Monedas
+                                </button>
+                                {% if tiene_permiso('Monedas', 'p_crear') %}
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="monedas" data-subtour="registro" data-url="{{ url_for('moneda_crud.gestion_monedas') }}" data-nombre="Monedas: Registrar Divisa" title="Nueva moneda en modal">
+                                    <i class="bi bi-plus-circle"></i> Registrar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('moneda_crud.gestion_monedas') }}" class="centro-ayuda-btn-link" title="Ir a Monedas"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="monedas" data-subtour="general" data-url="{{ url_for('moneda_crud.gestion_monedas') }}" data-nombre="Monedas">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 26. Bitácora del Sistema -->
+                    {% if tiene_permiso('Bitacora', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-configuracion" data-categoria="configuracion" data-modulo="bitacora">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-list-check"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Configuración</span>
+                                    <h6 class="centro-ayuda-card-title">Bitácora de Auditoría</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Trazabilidad cronológica de seguridad: registro de inicios de sesión, cambios críticos, inserciones y eliminaciones.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="bitacora" data-subtour="general" data-url="{{ url_for('bitacora.listar_bitacora') }}" data-nombre="Bitácora: Auditoría de Eventos" title="Trazabilidad">
+                                    <i class="bi bi-list-check"></i> Auditoría
+                                </button>
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('bitacora.listar_bitacora') }}" class="centro-ayuda-btn-link" title="Ir a Bitácora"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="bitacora" data-subtour="general" data-url="{{ url_for('bitacora.listar_bitacora') }}" data-nombre="Bitácora">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 27. Mantenimiento a la BD -->
+                    {% if tiene_permiso('Mantenimiento a la BD', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-configuracion" data-categoria="configuracion" data-modulo="mantenimiento_bd">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-database-fill-gear"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Configuración</span>
+                                    <h6 class="centro-ayuda-card-title">Mantenimiento de BD</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Generación de respaldos (*backup*) descargables de la base de datos y utilidades de restauración controlada.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="mantenimiento_bd" data-subtour="general" data-url="{{ url_for('mantenimiento.vista_mantenimiento') }}" data-nombre="Mantenimiento BD: Respaldos .SQL" title="Copias de seguridad">
+                                    <i class="bi bi-database"></i> Respaldos
+                                </button>
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('mantenimiento.vista_mantenimiento') }}" class="centro-ayuda-btn-link" title="Ir a Respaldo BD"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="mantenimiento_bd" data-subtour="general" data-url="{{ url_for('mantenimiento.vista_mantenimiento') }}" data-nombre="Mantenimiento BD">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 28. Reportes Estadísticos -->
+                    {% if tiene_permiso('Permisos', 'p_leer') or tiene_permiso('Bitacora', 'p_leer') or tiene_permiso('Mantenimiento a la BD', 'p_leer') %}
+                    <article class="centro-ayuda-card cat-configuracion" data-categoria="configuracion" data-modulo="estadisticas">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-file-earmark-bar-graph-fill"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Configuración</span>
+                                    <h6 class="centro-ayuda-card-title">Reportes Estadísticos</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Panel interactivo de métricas gerenciales: gráficos de rendimiento, comparativa de ventas, servicios y mantenimientos.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="estadisticas" data-subtour="general" data-url="{{ url_for('estadisticas.vista_estadisticas') }}" data-nombre="Estadísticas: Analítica y KPIs" title="Métricas y gráficos">
+                                    <i class="bi bi-bar-chart"></i> Métricas
+                                </button>
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('estadisticas.vista_estadisticas') }}" class="centro-ayuda-btn-link" title="Ir a Estadísticas"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="estadisticas" data-subtour="general" data-url="{{ url_for('estadisticas.vista_estadisticas') }}" data-nombre="Estadísticas">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+                    {% endif %}
+
+                    <!-- 29. Mi Perfil -->
+                    <article class="centro-ayuda-card cat-general" data-categoria="general" data-modulo="perfil">
+                        <div>
+                            <div class="centro-ayuda-card-header">
+                                <div class="centro-ayuda-card-icon"><i class="bi bi-person-circle"></i></div>
+                                <div class="centro-ayuda-card-info">
+                                    <span class="centro-ayuda-card-category">Mi Cuenta</span>
+                                    <h6 class="centro-ayuda-card-title">Mi Perfil</h6>
+                                </div>
+                            </div>
+                            <p class="centro-ayuda-card-desc">
+                                Configuración de tu cuenta de usuario: actualización de teléfono, foto de perfil, dirección y cambio de contraseña.
+                            </p>
+                            <div class="centro-ayuda-subtours">
+                                <button type="button" class="centro-ayuda-subtour-btn" data-modulo="perfil" data-subtour="general" data-url="{{ url_for('user.perfil') }}" data-nombre="Mi Perfil: Cuenta y Seguridad" title="Datos y contraseña">
+                                    <i class="bi bi-person-circle"></i> Mi Cuenta
+                                </button>
+                            </div>
+                        </div>
+                        <div class="centro-ayuda-card-meta">
+                            <span class="centro-ayuda-badge badge-prioritario"><i class="bi bi-stars"></i> Visita disponible</span>
+                            <div class="centro-ayuda-actions">
+                                <a href="{{ url_for('user.perfil') }}" class="centro-ayuda-btn-link" title="Ir a Mi Perfil"><i class="bi bi-arrow-right"></i> Ir</a>
+                                <button type="button" class="centro-ayuda-btn-tour" data-modulo="perfil" data-subtour="general" data-url="{{ url_for('user.perfil') }}" data-nombre="Mi Perfil">
+                                    <i class="bi bi-play-circle"></i> Iniciar visita
+                                </button>
+                            </div>
+                        </div>
+                    </article>
+
+                </div>
+
+                <!-- Estado Vacío: Sin Resultados -->
+                <div class="centro-ayuda-empty" id="centroAyudaSinResultados" role="status" aria-live="polite">
+                    <div class="centro-ayuda-empty-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h6 class="centro-ayuda-empty-title">No se encontraron módulos</h6>
+                    <p class="centro-ayuda-empty-desc">
+                        Intenta con otro término de búsqueda o selecciona otra categoría en las pestañas superiores.
+                    </p>
+                    <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" id="btnRestablecerFiltros">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i> Ver todos los módulos
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pie del Modal -->
+            <div class="modal-footer d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-light text-muted border px-2 py-1">
+                        <i class="bi bi-shield-check text-success me-1"></i> Acceso por permisos reales
+                    </span>
+                    <span class="small text-muted d-none d-md-inline">
+                        Presiona <kbd>Esc</kbd> para cerrar
+                    </span>
+                </div>
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast flotante de avisos -->
+<div class="position-fixed bottom-0 end-0 p-3 z-3" style="pointer-events: none;">
+    <div id="centroAyudaToast" 
+         class="toast align-items-center text-bg-dark border-0 shadow-lg" 
+         role="alert" 
+         aria-live="assertive" 
+         aria-atomic="true"
+         style="pointer-events: auto;">
+        <div class="d-flex">
+            <div class="toast-body d-flex align-items-center gap-2" id="centroAyudaToastTexto">
+                <i class="bi bi-info-circle-fill text-primary"></i> Mensaje informativo
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+    </div>
+</div>

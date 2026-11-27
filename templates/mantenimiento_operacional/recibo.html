@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recibo de Mantenimiento #{{ mantenimiento.cod_mantenimiento }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/recibo_mantenimiento.css') }}">
+</head>
+<body>
+    <button class="btn-imprimir" onclick="window.print()">
+        Imprimir Recibo
+    </button>
+
+    <div class="factura">
+        <div class="encabezado">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='img/automall.jpeg') }}" alt="Automall del Centro C.A.">
+                <p>Dirección: carrera 18 con esquina/calle 22, estado Lara, centro de Barquisimeto, municipio Iribarren parroquia Catedral</p>
+            </div>
+            <div class="info-factura">
+                <h2>RECIBO DE MANTENIMIENTO</h2>
+                <p><strong>N° {{ mantenimiento.cod_mantenimiento }}</strong></p>
+                <p><strong>Fecha:</strong> {{ mantenimiento.fecha_completada or mantenimiento.fecha_solicitud }}</p>
+            </div>
+        </div>
+
+        <div class="datos-vehiculo">
+            <h3>INFORMACIÓN DEL MANTENIMIENTO</h3>
+            <div class="fila">
+                <label>Vehículo (Placa):</label>
+                <span>{{ mantenimiento.placa }}</span>
+            </div>
+            <div class="fila">
+                <label>Taller:</label>
+                <span>{{ mantenimiento.nombre_taller or 'No especificado' }}</span>
+            </div>
+            <div class="fila">
+                <label>Tipo de Mantenimiento:</label>
+                <span>{{ mantenimiento.tipo }}</span>
+            </div>
+            <div class="fila">
+                <label>Autorizado por:</label>
+                <span>C.I. {{ mantenimiento.quien_autoriza }}</span>
+            </div>
+            <div class="fila">
+                <label>Descripción General:</label>
+                <span>{{ mantenimiento.descripcion_general }}</span>
+            </div>
+        </div>
+
+        <h3 style="color: #0d6efd; margin-bottom: 15px; border-bottom: 2px solid #0d6efd; padding-bottom: 8px;">🔧 DETALLE DE TRABAJOS Y REPUESTOS</h3>
+        
+        <div class="table-responsive">
+            <table class="tabla-detalles">
+                <thead>
+                    <tr>
+                        <th style="width: 70%;">Descripción</th>
+                        <th style="width: 15%; text-align: center;">Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if detalles %}
+                        {% for d in detalles %}
+                        <tr>
+                            <td>{{ d.descripcion_detalle or 'Sin descripción' }}</td>
+                            <td style="text-align: center;">{{ d.cantidad or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="2" style="text-align: center; color: #999;">Sin detalles registrados</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="totales">
+            <div class="fila-total">
+                <label>Costo Base (Presupuesto):</label>
+                <span>${{ "%.2f"|format(mantenimiento.costo_base) if mantenimiento.costo_base else '0.00' }}</span>
+            </div>
+            <div class="fila-total final">
+                <label>COSTO FINAL:</label>
+                <span>${{ "%.2f"|format(mantenimiento.costo_final) if mantenimiento.costo_final else '0.00' }}</span>
+            </div>
+        </div>
+
+        <div class="pie">
+            <p>Esto solo es un comprobante interno de la agencia AUTOMALL DEL CENTRO C.A.</p>
+        </div>
+    </div>
+</body>
+</html>

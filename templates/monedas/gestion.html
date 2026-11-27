@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- ENCABEZADO -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <i class="bi bi-cash-coin text-primary me-2"></i>
+            Gestión de Monedas
+        </h2>
+
+        <button class="btn btn-primary" onclick="abrirModalCrearMoneda()">
+            <i class="bi bi-plus-circle me-1"></i>
+            Nuevo Registro
+        </button>
+    </div>
+
+
+    <!-- SELECTOR -->
+    <div class="mb-4">
+        <div class="btn-group" role="group">
+
+            <button
+                type="button"
+                id="btnMonedas"
+                class="btn btn-primary"
+                onclick="mostrarSeccion('monedas')">
+                <i class="bi bi-cash-stack me-1"></i>
+                Monedas
+            </button>
+
+            <button
+                type="button"
+                id="btnDigitales"
+                class="btn btn-outline-primary"
+                onclick="mostrarSeccion('digitales')">
+                <i class="bi bi-currency-bitcoin me-1"></i>
+                Monedas Digitales
+            </button>
+
+        </div>
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- MONEDAS -->
+    <!-- ===================================================== -->
+
+    <div id="seccionMonedas">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bi bi-cash-stack me-1"></i>
+                    Monedas Registradas
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Moneda</th>
+                                <th>Símbolo</th>
+                                <th>Estado</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for m in monedas %}
+
+                            <tr>
+
+                                <td>
+                                    {{ m.cod_moneda }}
+                                </td>
+
+                                <td>
+                                    {{ m.nombre_moneda }}
+                                </td>
+
+                                <td>
+                                    {{ m.simbolo if m.simbolo else '-' }}
+                                </td>
+
+                                <td>
+
+                                    <span class="badge
+                                        {% if m.estado == 'Activo' %}
+                                            bg-success
+                                        {% else %}
+                                            bg-danger
+                                        {% endif %}
+                                    ">
+                                        {{ m.estado }}
+                                    </span>
+
+                                </td>
+
+                                <td class="text-end">
+
+                                    <button
+                                        class="btn btn-sm btn-outline-primary"
+                                        onclick="abrirModalEditarMoneda(
+                                            '{{ m.cod_moneda }}',
+                                            '{{ m.nombre_moneda }}',
+                                            '{{ m.simbolo if m.simbolo else '' }}',
+                                            '{{ m.estado }}'
+                                        )">
+
+                                        <i class="bi bi-pencil"></i>
+
+                                    </button>
+
+                                    <button
+                                        class="btn btn-sm btn-outline-danger"
+                                        onclick="eliminarMoneda('{{ m.cod_moneda }}')">
+
+                                        <i class="bi bi-trash"></i>
+
+                                    </button>
+
+                                </td>
+
+                            </tr>
+
+                            {% else %}
+
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    No hay monedas registradas.
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- MONEDAS DIGITALES -->
+    <!-- ===================================================== -->
+
+    <div id="seccionDigitales" style="display: none;">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bi bi-currency-bitcoin me-1"></i>
+                    Monedas Digitales Registradas
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead class="table-light">
+
+                            <tr>
+                                <th>ID</th>
+                                <th>Moneda Digital</th>
+                                <th>Símbolo</th>
+                                <th>Estado</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for m in monedas_digitales %}
+
+                            <tr>
+
+                                <td>
+                                    {{ m.cod_mon_digital }}
+                                </td>
+
+                                <td>
+                                    {{ m.nombre_digital }}
+                                </td>
+
+                                <td>
+                                    {{ m.simbolo_digital if m.simbolo_digital else '-' }}
+                                </td>
+
+                                <td>
+
+                                    {% if m.estado == 1 or m.estado == True %}
+
+                                        <span class="badge bg-success">
+                                            Activo
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-danger">
+                                            Inactivo
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td class="text-end">
+
+                                    <button
+                                        class="btn btn-sm btn-outline-primary"
+                                        onclick="abrirModalEditarDigital(
+                                            '{{ m.cod_mon_digital }}',
+                                            '{{ m.nombre_digital }}',
+                                            '{{ m.simbolo_digital if m.simbolo_digital else '' }}',
+                                            '{{ m.estado }}'
+                                        )">
+
+                                        <i class="bi bi-pencil"></i>
+
+                                    </button>
+
+
+                                    <button
+                                        class="btn btn-sm btn-outline-danger"
+                                        onclick="eliminarMonedaDigital('{{ m.cod_mon_digital }}')">
+
+                                        <i class="bi bi-trash"></i>
+
+                                    </button>
+
+                                </td>
+
+                            </tr>
+
+                            {% else %}
+
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    No hay monedas digitales registradas.
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- MODAL -->
+<!-- ========================================================= -->
+
+<div class="modal fade" id="modalMoneda" tabindex="-1">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title" id="modalTitulo">
+                    Nuevo Registro
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+
+            <form id="formMoneda" onsubmit="guardarRegistro(event)">
+
+                <div class="modal-body">
+
+                    <input
+                        type="hidden"
+                        id="tipo_registro"
+                        value="moneda">
+
+                    <input
+                        type="hidden"
+                        id="url_destino"
+                        value="">
+
+
+                    <!-- NOMBRE -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Nombre
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="nombre_registro"
+                            name="nombre_moneda"
+                            maxlength="50"
+                            required>
+
+                    </div>
+
+
+                    <!-- SIMBOLO -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Símbolo
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="simbolo_registro"
+                            name="simbolo"
+                            maxlength="30">
+
+                    </div>
+
+
+                    <!-- ESTADO -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Estado
+                        </label>
+
+                        <select
+                            class="form-select"
+                            id="estado_registro"
+                            name="estado">
+
+                            <option value="Activo">
+                                Activo
+                            </option>
+
+                            <option value="Inactivo">
+                                Inactivo
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                        Cancelar
+
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary">
+
+                        Guardar
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/crud_gestion.js') }}"></script>
+<script src="{{ url_for('static', filename='js/monedas.js') }}"></script>
+
+{% endblock %}

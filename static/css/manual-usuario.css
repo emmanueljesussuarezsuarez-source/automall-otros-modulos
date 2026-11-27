@@ -1,0 +1,892 @@
+/**
+ * AutoMall - Centro de Ayuda y Manual Interactivo
+ * Estilos aislados y específicos para el Centro de Ayuda
+ * (No afecta elementos globales del sistema)
+ */
+
+/* ==========================================================================
+   BOTÓN EN NAVBAR
+   ========================================================================== */
+.centro-ayuda-nav-btn {
+    color: #e2e8f0 !important;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 9999px;
+    padding: 0.35rem 0.75rem !important;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.centro-ayuda-nav-btn:hover,
+.centro-ayuda-nav-btn:focus-visible {
+    color: #ffffff !important;
+    background: rgba(0, 123, 255, 0.28);
+    border-color: rgba(56, 189, 248, 0.6);
+    box-shadow: 0 0 12px rgba(14, 165, 233, 0.35);
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.centro-ayuda-nav-btn:active {
+    transform: translateY(0);
+}
+
+.centro-ayuda-nav-btn .ayuda-btn-icon {
+    font-size: 1.05rem;
+    color: #38bdf8;
+    transition: transform 0.25s ease;
+}
+
+.centro-ayuda-nav-btn:hover .ayuda-btn-icon {
+    transform: rotate(15deg) scale(1.1);
+}
+
+.centro-ayuda-nav-btn .ayuda-btn-text {
+    font-size: 0.82rem;
+    letter-spacing: 0.01em;
+}
+
+/* ==========================================================================
+   MODAL DEL CENTRO DE AYUDA
+   ========================================================================== */
+#modalCentroAyuda .modal-dialog {
+    max-width: 1100px;
+    margin: 1.5rem auto;
+}
+
+#modalCentroAyuda .modal-content {
+    background-color: #f8fafc;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 18px;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+    overflow: hidden;
+}
+
+#modalCentroAyuda .modal-header {
+    background: linear-gradient(135deg, #0a192f 0%, #1e3a8a 100%);
+    color: #ffffff;
+    padding: 1.25rem 1.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#modalCentroAyuda .modal-header .modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+}
+
+#modalCentroAyuda .modal-header .modal-subtitle {
+    font-size: 0.83rem;
+    color: #94a3b8;
+    margin-top: 0.25rem;
+    margin-bottom: 0;
+}
+
+#modalCentroAyuda .modal-body {
+    padding: 1.5rem 1.75rem;
+    background-color: #f8fafc;
+    max-height: calc(85vh - 120px);
+}
+
+/* ==========================================================================
+   BARRA DE BÚSQUEDA Y FILTROS
+   ========================================================================== */
+.centro-ayuda-search-wrapper {
+    position: relative;
+    margin-bottom: 1.25rem;
+}
+
+.centro-ayuda-search-wrapper .search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 1rem;
+    pointer-events: none;
+}
+
+.centro-ayuda-search-input {
+    width: 100%;
+    padding: 0.75rem 2.75rem 0.75rem 2.75rem;
+    font-size: 0.92rem;
+    border-radius: 9999px;
+    border: 1.5px solid #cbd5e1;
+    background-color: #ffffff;
+    color: #1e293b;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+}
+
+.centro-ayuda-search-input:focus {
+    border-color: #0284c7;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15);
+    outline: none;
+}
+
+.centro-ayuda-search-clear {
+    position: absolute;
+    right: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: none;
+    border-radius: 50%;
+}
+
+.centro-ayuda-search-clear:hover {
+    color: #0f172a;
+}
+
+/* Píldoras de Categorías */
+.centro-ayuda-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.centro-ayuda-cat-btn {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    border-radius: 9999px;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.centro-ayuda-cat-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #cbd5e1;
+}
+
+.centro-ayuda-cat-btn.active {
+    background: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
+}
+
+.centro-ayuda-cat-btn .badge-count {
+    background: rgba(0, 0, 0, 0.08);
+    color: inherit;
+    font-size: 0.7rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 9999px;
+    font-weight: 600;
+}
+
+.centro-ayuda-cat-btn.active .badge-count {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+/* ==========================================================================
+   TARJETAS DE MÓDULOS
+   ========================================================================== */
+.centro-ayuda-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 1.15rem;
+}
+
+.centro-ayuda-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.15rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.centro-ayuda-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+    border-color: #93c5fd;
+}
+
+.centro-ayuda-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.centro-ayuda-card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+    color: #0284c7;
+    border: 1px solid rgba(2, 132, 199, 0.15);
+}
+
+/* Variantes sutiles de icono por categoría */
+.cat-operaciones .centro-ayuda-card-icon {
+    background: #eff6ff;
+    color: #2563eb;
+    border-color: #bfdbfe;
+}
+
+.cat-acondicionamiento .centro-ayuda-card-icon {
+    background: #f0fdf4;
+    color: #16a34a;
+    border-color: #bbf7d0;
+}
+
+.cat-ventas .centro-ayuda-card-icon {
+    background: #fefce8;
+    color: #ca8a04;
+    border-color: #fef08a;
+}
+
+.cat-usuarios .centro-ayuda-card-icon {
+    background: #faf5ff;
+    color: #9333ea;
+    border-color: #e9d5ff;
+}
+
+.cat-configuracion .centro-ayuda-card-icon {
+    background: #f1f5f9;
+    color: #475569;
+    border-color: #cbd5e1;
+}
+
+.centro-ayuda-card-info {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.centro-ayuda-card-title {
+    font-size: 0.96rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.2rem;
+    line-height: 1.3;
+}
+
+.centro-ayuda-card-category {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.centro-ayuda-card-desc {
+    font-size: 0.83rem;
+    color: #475569;
+    line-height: 1.45;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.centro-ayuda-card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+/* Badges de Estado */
+.centro-ayuda-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.25rem 0.55rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.centro-ayuda-badge.badge-prioritario {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+
+.centro-ayuda-badge.badge-fase {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+.centro-ayuda-badge.badge-acceso {
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+/* Botones de Acción de Tarjeta */
+.centro-ayuda-actions {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.centro-ayuda-btn-tour {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #ffffff;
+    border: none;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.centro-ayuda-btn-tour:hover {
+    background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+}
+
+.centro-ayuda-btn-link {
+    background: #ffffff;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.35rem 0.65rem;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.centro-ayuda-btn-link:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #94a3b8;
+}
+
+/* ==========================================================================
+   ESTADO VACÍO (SIN RESULTADOS DE BÚSQUEDA)
+   ========================================================================== */
+.centro-ayuda-empty {
+    display: none;
+    text-align: center;
+    padding: 3rem 1.5rem;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px dashed #cbd5e1;
+}
+
+.centro-ayuda-empty.visible {
+    display: block;
+}
+
+.centro-ayuda-empty-icon {
+    font-size: 2.8rem;
+    color: #94a3b8;
+    margin-bottom: 0.75rem;
+}
+
+.centro-ayuda-empty-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.centro-ayuda-empty-desc {
+    font-size: 0.86rem;
+    color: #64748b;
+    margin-bottom: 1.25rem;
+}
+
+/* ==========================================================================
+   TOAST / AVISO DE FASE
+   ========================================================================== */
+.centro-ayuda-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #0f172a;
+    color: #ffffff;
+    padding: 0.75rem 1.25rem;
+    border-radius: 10px;
+    font-size: 0.86rem;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    z-index: 1090;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.centro-ayuda-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.centro-ayuda-toast i {
+    color: #38bdf8;
+    font-size: 1.15rem;
+}
+
+/* ==========================================================================
+   ACCESIBILIDAD Y RESPONSIVE
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .centro-ayuda-nav-btn,
+    .centro-ayuda-card,
+    .centro-ayuda-cat-btn,
+    .centro-ayuda-search-input,
+    .centro-ayuda-toast {
+        transition: none !important;
+        transform: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #modalCentroAyuda .modal-dialog {
+        margin: 0.75rem;
+        max-width: calc(100% - 1.5rem);
+    }
+    
+    #modalCentroAyuda .modal-header,
+    #modalCentroAyuda .modal-body {
+        padding: 1.15rem 1.15rem;
+    }
+
+    .centro-ayuda-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .centro-ayuda-categories {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 0.5rem;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .centro-ayuda-cat-btn {
+        flex-shrink: 0;
+    }
+
+    .centro-ayuda-nav-btn .ayuda-btn-text {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   MOTOR DE VISITA GUIADA (OVERLAY, SPOTLIGHT Y TOOLTIP INTERACTIVO)
+   ========================================================================== */
+.tour-overlay-wrapper {
+    position: fixed;
+    inset: 0;
+    z-index: 1080;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* Foco Luminoso (Spotlight con halo suave que enmarca el elemento) */
+.tour-spotlight {
+    position: fixed;
+    pointer-events: auto;
+    border-radius: 10px;
+    border: 2.5px solid #0284c7;
+    box-shadow: 0 0 0 9999px rgba(10, 25, 47, 0.72),
+                0 0 20px rgba(2, 132, 199, 0.55);
+    transition: top 0.32s cubic-bezier(0.2, 0.8, 0.2, 1),
+                left 0.32s cubic-bezier(0.2, 0.8, 0.2, 1),
+                width 0.32s cubic-bezier(0.2, 0.8, 0.2, 1),
+                height 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: 1081;
+    animation: tour-pulse-border 2.5s infinite;
+}
+
+@keyframes tour-pulse-border {
+    0%, 100% {
+        border-color: #0284c7;
+        box-shadow: 0 0 0 9999px rgba(10, 25, 47, 0.72), 0 0 16px rgba(2, 132, 199, 0.45);
+    }
+    50% {
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 9999px rgba(10, 25, 47, 0.72), 0 0 28px rgba(56, 189, 248, 0.75);
+    }
+}
+
+/* Tooltip Flotante */
+.tour-tooltip {
+    position: fixed;
+    z-index: 1085;
+    pointer-events: auto;
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    border-radius: 14px;
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.35);
+    overflow: hidden;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    opacity: 0;
+    transform: translateY(6px);
+}
+
+.tour-tooltip.tour-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Flecha Direccional */
+.tour-tooltip-arrow {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: #ffffff;
+    transform: rotate(45deg);
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    z-index: -1;
+}
+
+.tour-tooltip.placement-bottom .tour-tooltip-arrow {
+    top: -7px;
+    left: calc(50% - 7px);
+    border-bottom: none;
+    border-right: none;
+}
+
+.tour-tooltip.placement-top .tour-tooltip-arrow {
+    bottom: -7px;
+    left: calc(50% - 7px);
+    border-top: none;
+    border-left: none;
+}
+
+.tour-tooltip.placement-right .tour-tooltip-arrow {
+    left: -7px;
+    top: calc(50% - 7px);
+    border-top: none;
+    border-right: none;
+}
+
+.tour-tooltip.placement-left .tour-tooltip-arrow {
+    right: -7px;
+    top: calc(50% - 7px);
+    border-bottom: none;
+    border-left: none;
+}
+
+/* Encabezado del Tooltip */
+.tour-tooltip-header {
+    background: #0f172a;
+    color: #ffffff;
+    padding: 0.85rem 1.15rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tour-module-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.15);
+    padding: 0.2rem 0.55rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.tour-step-badge {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.tour-btn-close {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 0.95rem;
+    cursor: pointer;
+    padding: 0.2rem;
+    line-height: 1;
+    border-radius: 6px;
+    transition: color 0.15s ease, background 0.15s ease;
+}
+
+.tour-btn-close:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* Barra de Progreso */
+.tour-progress-bar-container {
+    width: 100%;
+    height: 4px;
+    background: #e2e8f0;
+}
+
+.tour-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Cuerpo del Tooltip */
+.tour-tooltip-body {
+    padding: 1.15rem 1.25rem 0.75rem 1.25rem;
+    background: #ffffff;
+}
+
+.tour-tooltip-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.35rem;
+}
+
+.tour-tooltip-content {
+    font-size: 0.85rem;
+    color: #475569;
+    line-height: 1.5;
+    margin-bottom: 0;
+}
+
+/* Pie y Botones */
+.tour-tooltip-footer {
+    padding: 0.85rem 1.25rem;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tour-footer-left,
+.tour-footer-right {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.tour-btn-subtle {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+    transition: color 0.15s ease;
+}
+
+.tour-btn-subtle:hover {
+    color: #0f172a;
+    text-decoration: underline;
+}
+
+.tour-btn-secondary {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: all 0.15s ease;
+}
+
+.tour-btn-secondary:hover:not(:disabled) {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #94a3b8;
+}
+
+.tour-btn-secondary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.tour-btn-primary {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    border: 1px solid transparent;
+    color: #ffffff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.35rem 0.85rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+}
+
+.tour-btn-primary:hover {
+    background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+    box-shadow: 0 4px 10px rgba(2, 132, 199, 0.35);
+}
+
+.tour-btn-success {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    border: 1px solid transparent;
+    color: #ffffff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.35rem 0.85rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+}
+
+.tour-btn-success:hover {
+    background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.35);
+}
+
+/* Indicadores de Atajos de Teclado */
+.tour-keyboard-hints {
+    padding: 0.4rem 1.25rem;
+    background: #f1f5f9;
+    border-top: 1px solid #e2e8f0;
+    font-size: 0.7rem;
+    color: #64748b;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.8rem;
+}
+
+.tour-keyboard-hints kbd {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 0.1rem 0.35rem;
+    font-size: 0.68rem;
+    font-family: inherit;
+    color: #334155;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tour-spotlight,
+    .tour-tooltip,
+    .tour-progress-bar {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* ==========================================================================
+   SUBTOURS EN TARJETAS DEL CENTRO DE AYUDA Y MODALES
+   ========================================================================== */
+.centro-ayuda-subtours {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.65rem;
+    padding-top: 0.65rem;
+    border-top: 1px dashed #e2e8f0;
+}
+
+.centro-ayuda-subtour-btn {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    font-size: 0.74rem;
+    font-weight: 600;
+    padding: 0.22rem 0.55rem;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-decoration: none;
+}
+
+.centro-ayuda-subtour-btn:hover {
+    background: #e0f2fe;
+    color: #0369a1;
+    border-color: #7dd3fc;
+    transform: translateY(-1px);
+}
+
+.centro-ayuda-subtour-btn.completed {
+    background: #f0fdf4;
+    color: #15803d;
+    border-color: #86efac;
+}
+
+.centro-ayuda-subtour-btn.in-progress {
+    background: #fefce8;
+    color: #854d0e;
+    border-color: #fef08a;
+}
+
+/* Soporte cuando el tour resalta elementos dentro de un modal de Bootstrap */
+body.modal-open .tour-overlay-wrapper {
+    z-index: 1090;
+}
+
+body.modal-open .tour-spotlight {
+    z-index: 1091;
+}
+
+body.modal-open .tour-tooltip {
+    z-index: 1095;
+}
+
+
+

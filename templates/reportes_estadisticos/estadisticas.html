@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-4">
+
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-4 bg-white p-3 rounded shadow-sm gap-3">
+        <h2 class="fw-bold mb-0 text-primary" id="titulo-reporte">
+            <i class="bi bi-bar-chart-fill"></i> Panel de Estadísticas
+        </h2>
+
+        <div class="d-flex flex-wrap align-items-center gap-3">
+            <div class="d-flex align-items-center gap-2 flex-grow-1 flex-md-grow-0">
+                <label for="selector-reporte" class="fw-bold text-muted mb-0 text-nowrap">Módulo:</label>
+                <select id="selector-reporte" class="form-select border-primary shadow-sm" style="width: 100%; max-width: 260px;">
+                    <option value="ventas">Ventas</option>
+                    <option value="vehiculos">Vehículos</option>
+                    <option value="mantenimiento">Mantenimiento</option>
+                    <option value="servicios">Servicios</option>
+                    <option value="citas">Citas</option>
+                    <option value="compras_insumos">Compras e Insumos</option>
+                    <option value="pagos">Pagos / Cuentas por Cobrar</option>
+                </select>
+            </div>
+
+            <div class="d-flex align-items-center gap-2 ms-auto ms-lg-0">
+                <button id="btn-generar" class="btn btn-primary">
+                    <i class="bi bi-play-fill"></i> Generar
+                </button>
+
+                <div class="dropdown">
+                    <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-download"></i> Exportar
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item exportar-opcion" href="#" data-formato="pdf">PDF</a></li>
+                        <li><a class="dropdown-item exportar-opcion" href="#" data-formato="excel">Excel</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light fw-bold">
+            <i class="bi bi-funnel"></i> Filtros del módulo
+        </div>
+        <div class="card-body" id="filtros-container">
+        </div>
+    </div>
+
+    <div class="row mb-4" id="kpi-container"></div>
+
+    <div class="row" id="charts-container"></div>
+
+    <div class="row mt-4" id="tabla-detalle-container" style="display:none;">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light fw-bold">
+                    <i class="bi bi-table"></i> Detalle de registros
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover mb-0" id="tabla-detalle"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="{{ url_for('static', filename='js/reportes_estadisticos.js') }}"></script>
+{% endblock %}

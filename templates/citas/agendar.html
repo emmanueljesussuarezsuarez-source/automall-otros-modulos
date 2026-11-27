@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/flatpickr.min.css') }}">
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <div class="card card-registro border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-body p-5">
+                    
+                    <div class="text-center mb-5">
+                        <div class="display-6 fw-bold text-dark mb-2">Agendar Nueva Cita</div>
+                        <p class="text-muted">Complete los campos para programar una cita de revisión para un vehículo</p>
+                        <div class="mx-auto" style="width: 100px; height: 3px; background: #007bff;"></div>
+                    </div>
+                    
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flask-msg-data" data-message="{{ message }}" data-category="{{ category }}" style="display: none;"></div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+
+                    <!-- Formulario-->
+                    <div class="row g-5">
+                        
+                        <div class="col-lg-7">
+                            <form action="{{ url_for('citas.agendar') }}" method="post" class="row g-4" id="form-agendar">
+                                <div class="col-md-6">
+                                    <label for="fecha_cita" class="form-label fw-semibold text-secondary"><i class="bi bi-calendar me-2"></i>Fecha de Cita</label>
+                                    <input type="text" class="form-control py-2" name="fecha_cita" placeholder="Seleccione la fecha..." id="fecha_cita" value="{{ datos.fecha_cita if datos else '' }}" required>
+                                    <div class="invalid-feedback">Por favor seleccione una fecha válida.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="hora_cita" class="form-label fw-semibold text-secondary"><i class="bi bi-clock me-2"></i>Hora de Cita</label>
+                                    <input type="text" class="form-control py-2" id="hora_cita" placeholder="Seleccione la hora..." name="hora_cita" value="{{ datos.hora_cita if datos else '' }}" required>
+                                    <div class="invalid-feedback">Por favor seleccione una hora válida (8:00 - 18:00).</div>
+                                </div>
+                                
+                                {% if session.get('cod_rol') == 1 %}
+                                <div class="col-12 mt-4">
+                                    <label for="select-cliente" class="form-label fw-semibold text-secondary"><i class="bi bi-person-fill me-2"></i>Seleccione un Cliente</label>
+                                    <select name="cedula_cliente" id="select-cliente" class="form-select py-2" required>
+                                        <option value="" disabled {% if not datos or not datos.cedula_cliente %}selected{% endif %}>Elija el cliente para el cual se agendará la cita...</option>
+                                        {% for cliente in clientes %}
+                                            <option value="{{ cliente.cedula_usuario }}" 
+                                                    {% if datos and datos.cedula_cliente|string == cliente.cedula_usuario|string %}selected{% endif %}>
+                                                {{ cliente.nombre }} {{ cliente.apellido }} (C.I. {{ cliente.cedula_usuario }} - {{ cliente.correo }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="invalid-feedback">Debe seleccionar un cliente de la lista.</div>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="col-12 mt-4">
+                                    <label for="select-vehiculo" class="form-label fw-semibold text-secondary"><i class="bi bi-car-front-fill me-2"></i>Seleccione un Vehículo</label>
+                                    <select name="cod_catalogo" id="select-vehiculo" class="form-select py-2" required>
+                                        <option value="" disabled {% if not datos or not datos.cod_catalogo %}selected{% endif %}>Elija un vehículo del catálogo disponible...</option>
+                                        {% for vehiculo in vehiculos %}
+                                            <option value="{{ vehiculo.cod_catalogo }}" 
+                                                    data-marca="{{ vehiculo.nombre_marca }}" 
+                                                    data-modelo="{{ vehiculo.nombre_modelo }}" 
+                                                    data-color="{{ vehiculo.color }}" 
+                                                    data-anio="{{ vehiculo.anio }}" 
+                                                    data-placa="{{ vehiculo.placa }}"
+                                                    data-imagen="{% if vehiculo.imagen_url %}{{ url_for('static', filename=vehiculo.imagen_url) }}{% else %}{% endif %}"
+                                                    {% if datos and datos.cod_catalogo|string == vehiculo.cod_catalogo|string %}selected{% endif %}>
+                                                {{ vehiculo.nombre_marca }} {{ vehiculo.nombre_modelo }} ({{ vehiculo.color }}, {{ vehiculo.anio }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="invalid-feedback">Debe seleccionar un vehículo disponible.</div>
+                                </div>
+
+                                <div class="col-12 mt-5">
+                                    <button type="submit" class="btn btn-primary w-100 shadow-sm py-3 fw-bold rounded-3" id="btn-agendar" style="background-color: #007bff; border-color: #007bff;">
+                                        <i class="bi bi-journal-check me-2"></i> Agendar Cita
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Vista Previa del Auto -->
+                        <div class="col-lg-5 d-flex align-items-center justify-content-center border-start">
+                            <div id="contenedor-previsualizacion" class="w-100 p-3 text-center">
+                                <div class="text-muted py-5 border border-dashed rounded-3 bg-light">
+                                    <i class="bi bi-image text-secondary-50" style="font-size: 3rem;"></i>
+                                    <h5 class="mt-3 fw-semibold">Ficha del Vehículo</h5>
+                                    <p class="small text-muted px-4">Seleccione un vehículo disponible de la lista para previsualizar su fotografía y especificaciones.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ url_for('static', filename='js/flatpickr.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/flatpickr.es.js') }}"></script>
+<script src="{{ url_for('static', filename='js/agendar_cita.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link class="rounded-circle" rel="icon" type="image/png"
+        href="{{ url_for('static', filename='img/automall.jpeg') }}">
+    <title>AutoMall | Gestión Automotriz</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/manual-usuario.css') }}">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-2">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
+                <i class="bi bi-car-front-fill me-2 text-primary fs-4"></i>
+                <span>AutoMall</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center gap-1">
+                    <li class="nav-item"><a class="nav-link px-2" href="/">Inicio</a></li>
+
+                    {% if 'usuario_nombre' in session %}
+
+                    {% if tiene_permiso('Catalogo', 'p_leer') or tiene_permiso('Vehiculos', 'p_leer') or
+                    tiene_permiso('Marca', 'p_leer') or tiene_permiso('Modelo', 'p_leer') %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle px-2" href="#" id="navOperaciones" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Operaciones
+                        </a>
+                        <ul class="dropdown-menu shadow border-0">
+                            <li>
+                                <h6 class="dropdown-header">Abastecimiento</h6>
+                            </li>
+                            {% if tiene_permiso('Vehiculos', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('vehiculos.lista') }}"><i
+                                        class="bi bi-cart-plus me-2 text-primary"></i>Vehículos</a></li>
+                            {% endif %}
+                            {% if tiene_permiso('Marca', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('marcas.registro_marca') }}"><i
+                                        class="bi bi-tag me-2 text-primary"></i>Marca</a></li>
+                            {% endif %}
+                            {% if tiene_permiso('Modelo', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('modelos.registro_modelo') }}"><i
+                                        class="bi bi-car-front me-2 text-primary"></i>Modelo</a></li>
+                            {% endif %}
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <h6 class="dropdown-header">Inventario y Flota</h6>
+                            </li>
+                            {% if tiene_permiso('Catalogo', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('catalogo.listar') }}"><i
+                                        class="bi bi-search me-2 text-primary"></i>Catálogo de Vehículos</a></li>
+                            {% endif %}
+                            {% if tiene_permiso('Vehiculos', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('vehiculos.historial') }}"><i
+                                        class="bi bi-clock-history me-2 text-primary"></i>Historial de Vehículos</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    {% if tiene_permiso('Mantenimiento', 'p_leer') or tiene_permiso('Servicios', 'p_leer') or
+                    tiene_permiso('Taller', 'p_leer') or tiene_permiso('Compras', 'p_leer') or tiene_permiso('Insumos',
+                    'p_leer') or tiene_permiso('mantenimiento_operacional', 'p_leer') or tiene_permiso('servicios',
+                    'p_leer') %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle px-2" href="#" id="navMantenimiento" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Acondicionamiento
+                        </a>
+                        <ul class="dropdown-menu shadow border-0">
+                            <li>
+                                <h6 class="dropdown-header">Control de Mantenimiento</h6>
+                            </li>
+                            {% if tiene_permiso('Taller', 'p_leer') %}
+                            <li><a class="dropdown-item" href="/taller"><i
+                                        class="bi bi-tools me-2 text-primary"></i>Taller de Vehículos</a></li>
+                            {% endif %}
+                            {% if tiene_permiso('mantenimiento_operacional', 'p_leer') %}
+                            <li><a class="dropdown-item"
+                                    href="{{ url_for('mantenimiento_operacional.listar_mantenimiento') }}"><i
+                                        class="bi bi-wrench-adjustable me-2 text-primary"></i>Mantenimiento</a></li>
+                            {% endif %}
+                            {% if tiene_permiso('servicios', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('servicios.listar_servicios') }}"><i
+                                        class="bi bi-car-front-fill me-2 text-primary"></i>Servicios</a></li>
+                            {% endif %}
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <h6 class="dropdown-header">Control de Compras</h6>
+                            </li>
+                            {% if tiene_permiso('Compras', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('compras.listar') }}"><i
+                                        class="bi bi-bag-check me-2 text-primary"></i>Compras de Accesorios</a></li>
+                            {% endif %}
+                            {% if tiene_permiso('Insumos', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('insumos.listar') }}"><i
+                                        class="bi bi-box-seam me-2 text-primary"></i>Insumos de Vehículos</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    {% if tiene_permiso('Citas', 'p_leer') or tiene_permiso('Ventas', 'p_leer') or
+                    tiene_permiso('Pagos', 'p_leer') or tiene_permiso('Pagosadmin', 'p_leer') %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle px-2" href="#" id="navVentasCitas" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Ventas y Citas
+                        </a>
+                        <ul class="dropdown-menu shadow border-0">
+                            {% if tiene_permiso('Citas', 'p_leer') %}
+                            <li>
+                                <h6 class="dropdown-header">Registro de Citas</h6>
+                            </li>
+                            <li><a class="dropdown-item" href="{{ url_for('citas.consultar') }}"><i
+                                        class="bi bi-calendar-event me-2 text-primary"></i>Gestión de Citas</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            {% endif %}
+                            <li>
+                                <h6 class="dropdown-header">Ventas y Pagos</h6>
+                            </li>
+                            {% if tiene_permiso('Ventas', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('ventas.listado_ventas') }}"><i
+                                        class="bi bi-cash-stack me-2 text-primary"></i>Venta de Vehículos</a></li>
+                            {% endif %}
+                            {% if tiene_permiso('Pagosadmin', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('pagos.listar_pagos_admin') }}"><i
+                                        class="bi bi-credit-card me-2 text-primary"></i>Gestionar Pagos</a></li>
+                            {% elif tiene_permiso('Pagos', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('pagos.listar_pagos') }}"><i
+                                        class="bi bi-credit-card me-2 text-primary"></i>Gestionar Pagos</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    {% if tiene_permiso('Usuarios', 'p_leer') or tiene_permiso('Proveedor', 'p_leer') or
+                    tiene_permiso('Clientes', 'p_leer') or tiene_permiso('Vendedor', 'p_leer') %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle px-2" href="#" id="navUsuarios" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Usuarios
+                        </a>
+                        <ul class="dropdown-menu shadow border-0">
+                            <li>
+                                <h6 class="dropdown-header">Administración</h6>
+                            </li>
+                            {% if tiene_permiso('Proveedor', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('propietarios.lista') }}"><i
+                                        class="bi bi-person-badge me-2 text-primary"></i>Propietarios</a></li>
+                            {% endif %}
+                            {% if tiene_permiso('Clientes', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('clientes.listar_clientes') }}"><i
+                                        class="bi bi-people me-2 text-primary"></i>Clientes</a></li>
+                            {% endif %}
+                            {% if tiene_permiso('Vendedor', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('vendedor.listar') }}"><i
+                                        class="bi bi-person-vcard me-2 text-primary"></i>Vendedores</a></li>
+                            {% endif %}
+                            {% if tiene_permiso('Compras', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('compras.listar_proveedores') }}"><i
+                                        class="bi bi-building me-2 text-primary"></i>Proveedores</a></li>
+                            {% endif %}
+                            {% if tiene_permiso('Usuarios', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('user.listar') }}"><i
+                                        class="bi bi-gear-wide-connected me-2 text-primary"></i>Gestión de Usuarios</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    {% if tiene_permiso('Permisos', 'p_leer') or tiene_permiso('Bitacora', 'p_leer') or
+                    tiene_permiso('Mantenimiento a la BD', 'p_leer') %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-info fw-semibold px-2 d-flex align-items-center gap-1"
+                            href="#" id="navConfig" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-gear-fill"></i> Configuración
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li>
+                                <h6 class="dropdown-header">Administración</h6>
+                            </li>
+                            {% if tiene_permiso('Permisos', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('permisos.gestionar') }}"><i
+                                        class="bi bi-shield-lock me-2 text-primary"></i>Gestión de Permisos</a></li>
+                            {% endif %}
+                            {% if tiene_permiso('Roles', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('roles_crud.gestion_roles') }}"><i
+                                        class="bi bi-shield-shaded me-2 text-primary"></i>Gestión de Roles</a></li>
+                            {% endif %}
+                            {% if tiene_permiso('Modulos', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('config_crud.gestion_configuracion') }}"><i
+                                        class="bi bi-grid-3x3-gap me-2 text-primary"></i>Gestión de Módulos y
+                                    Acciones</a></li>
+                            {% endif %}
+                            {% if tiene_permiso('Metodo', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('metodos_pago_crud.gestion_metodos') }}"><i
+                                        class="bi bi-credit-card me-2 text-primary"></i>Métodos de Pago</a></li>
+                            {% endif %}
+                            {% if tiene_permiso('Bancos', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('bancos_crud.gestion_bancos') }}"><i
+                                        class="bi bi-bank me-2 text-primary"></i>Gestión de Bancos</a></li>
+                            {% endif %}
+                            {% if tiene_permiso('Monedas', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('moneda_crud.gestion_monedas') }}"><i
+                                        class="bi bi-cash-coin me-2 text-primary"></i>Gestión de Monedas</a></li>
+                            {% endif %}
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <h6 class="dropdown-header">Reportes y Datos</h6>
+                            </li>
+                            {% if tiene_permiso('Bitacora', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('bitacora.listar_bitacora') }}"><i
+                                        class="bi bi-list-check me-2 text-primary"></i>Bitácora</a></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="{{ url_for('estadisticas.vista_estadisticas') }}"><i
+                                        class="bi bi-file-earmark-bar-graph me-2 text-primary"></i>Reportes
+                                    Estadísticos</a></li>
+                            {% if tiene_permiso('Mantenimiento a la BD', 'p_leer') %}
+                            <li><a class="dropdown-item" href="{{ url_for('mantenimiento.vista_mantenimiento') }}"><i
+                                        class="bi bi-database-fill-gear me-2 text-primary"></i>Mantenimiento de BD</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% endif %}
+
+                    <div class="vr bg-secondary d-none d-lg-block mx-2 my-1 opacity-50" style="height: 24px;"></div>
+
+                    <li class="nav-item dropdown me-1 position-relative">
+                        <a class="nav-link text-light position-relative px-2 py-1 d-flex align-items-center" href="#"
+                            id="navNotificaciones" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-bell-fill fs-5"></i>
+                            <span id="notif-badge"
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger d-none"
+                                style="font-size: 0.65rem; padding: 0.3em 0.5em;">
+                                0
+                            </span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0" id="notif-dropdown-list"
+                            style="width: 320px; max-width: 90vw;" aria-labelledby="navNotificaciones">
+                            <div class="p-3 text-center text-muted">Cargando notificaciones...</div>
+                        </div>
+                    </li>
+
+                    {% include 'includes/manual_usuario/boton_ayuda.html' %}
+
+                    <li class="nav-item dropdown ms-lg-1">
+                        <a class="nav-link dropdown-toggle text-light d-flex align-items-center gap-2 px-2 py-1 rounded-3 hover-bg-dark"
+                            href="#" id="navPerfil" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="{{ url_for('static', filename='uploads/perfiles/' ~ (session.get('usuario_foto') or 'default.jpg')) }}"
+                                alt="Perfil" class="rounded-circle shadow-sm"
+                                style="width: 32px; height: 32px; object-fit: cover;"
+                                data-default-img="{{ url_for('static', filename='uploads/perfiles/default.jpg') }}"
+                                onerror="this.src=this.dataset.defaultImg">
+                            <span class="fw-semibold text-capitalize">{{ session['usuario_nombre'] }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.perfil') }}">
+                                    <i class="bi bi-person me-2 text-primary"></i> Mi Perfil
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center text-danger fw-semibold"
+                                    href="/logout">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
+                    <li class="nav-item"><a class="btn btn-primary btn-sm rounded-pill px-4 ms-lg-2"
+                            href="{{ url_for('user.registro') }}">Registro</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer-custom">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="fw-bold mb-3">AutoMall System</h5>
+                    <p class="small text-secondary-light">Gestión inteligente de inventario. El estándar de oro para
+                        concesionarios universitarios.</p>
+                </div>
+                <div class="col-md-4 mb-4 text-center">
+                    <h5 class="fw-bold mb-3">Conecta</h5>
+                    <div class="social-icons">
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-twitter-x"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4 text-md-end">
+                    <h5 class="fw-bold mb-3">Soporte</h5>
+                    <p class="small mb-1">soporte@automall.com</p>
+                    <p class="small mb-2">Barquisimeto, Venezuela</p>
+
+                    <!-- Botón de acceso al Manual de Usuario (Estricto para Superusuario [1], Admin [2] y Cliente [4]) -->
+                    {% if 'usuario_nombre' in session %}
+                    {% set rol_text = (session.get('usuario_rol', session.get('rol', ''))|string)|lower %}
+                    {% set cod_rol = session.get('cod_rol')|int(0) %}
+
+                    {% if cod_rol in [1, 2, 4] or 'super' in rol_text or 'admin' in rol_text or 'cliente' in rol_text %}
+                    <a href="{{ url_for('ayuda.mostrar_manual') }}"
+                        class="btn btn-outline-light btn-sm rounded-pill px-3 py-1 mt-1 text-decoration-none">
+                        <i class="bi bi-journal-bookmark-fill text-primary me-1"></i> Manual de Usuario
+                    </a>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            <hr class="opacity-25">
+            <div class="text-center pb-2">
+                <p class="small mb-0 opacity-50">&copy; 2026 AutoMall. Innovación sobre ruedas.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
+    {% if 'usuario_nombre' in session %}
+    {% include 'includes/manual_usuario/modal_ayuda.html' %}
+    {% include 'includes/manual_usuario/tour_overlay.html' %}
+    <script type="module" src="{{ url_for('static', filename='js/manual-usuario/manual-usuario.js') }}"></script>
+    {% endif %}
+</body>
+
+</html>

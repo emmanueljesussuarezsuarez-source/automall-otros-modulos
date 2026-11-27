@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="container mt-4">
+    <h2 class="mb-4"><i class="bi bi-gear-fill text-primary me-2"></i>Configuración de Sistema</h2>
+
+    <!-- Pestañas de Navegación -->
+    <ul class="nav nav-pills mb-4" id="configTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold" id="modulos-tab" data-bs-toggle="tab" data-bs-target="#modulos" type="button" role="tab">
+                <i class="bi bi-box me-1"></i> Catálogo de Módulos
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="acciones-tab" data-bs-toggle="tab" data-bs-target="#acciones" type="button" role="tab">
+                <i class="bi bi-shield-check me-1"></i> Catálogo de Acciones
+            </button>
+        </li>
+    </ul>
+
+    <!-- Contenido de las Pestañas -->
+    <div class="tab-content shadow-sm bg-white rounded p-4 border" id="configTabContent">
+        
+        <!-- PESTAÑA: MÓDULOS -->
+        <div class="tab-pane fade show active" id="modulos" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="m-0 text-secondary">Gestión de Módulos</h5>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalCrearModulo">
+                    <i class="bi bi-plus-lg"></i> Nuevo Módulo
+                </button>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="tablaModulos" style="table-layout: fixed; width: 100%;">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="10%">ID</th>
+                            <th width="50%">Nombre del Módulo</th>
+                            <th width="20%">Estado</th>
+                            <th width="20%" class="text-center">Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in modulos %}
+                        <tr>
+                            <td class="fw-bold text-break">#{{ m.cod_modulo }}</td>
+                            <td class="text-break">{{ m.nombre_modulo }}</td>
+                            <td>
+                                {% if m.estatus == 1 %}
+                                    <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-outline-primary btn-editar-modulo" 
+                                        data-id="{{ m.cod_modulo }}"
+                                        data-nombre="{{ m.nombre_modulo }}"
+                                        data-estatus="{{ m.estatus }}"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalEditarModulo"
+                                        title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger btn-eliminar-registro" 
+                                        data-url="{{ url_for('config_crud.eliminar_modulo', id=m.cod_modulo) }}" 
+                                        data-nombre="{{ m.nombre_modulo }}"
+                                        title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">
+                                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                No hay módulos registrados.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PESTAÑA: ACCIONES -->
+        <div class="tab-pane fade" id="acciones" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="m-0 text-secondary">Gestión de Acciones Globales</h5>
+                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalCrearAccion">
+                    <i class="bi bi-plus-lg"></i> Nueva Acción
+                </button>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="tablaAcciones" style="table-layout: fixed; width: 100%;">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="10%">ID</th>
+                            <th width="50%">Nombre de la Acción</th>
+                            <th width="20%">Estado</th>
+                            <th width="20%" class="text-center">Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in acciones %}
+                        <tr>
+                            <td class="fw-bold text-break">#{{ a.cod_accion }}</td>
+                            <td class="text-break"><span class="font-monospace text-primary">{{ a.nom_accion }}</span></td>
+                            <td>
+                                {% if a.estatus == 1 %}
+                                    <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactivo</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-outline-primary btn-editar-accion" 
+                                        data-id="{{ a.cod_accion }}"
+                                        data-nombre="{{ a.nom_accion }}"
+                                        data-estatus="{{ a.estatus }}"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalEditarAccion"
+                                        title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger btn-eliminar-registro" 
+                                        data-url="{{ url_for('config_crud.eliminar_accion', id=a.cod_accion) }}" 
+                                        data-nombre="{{ a.nom_accion }}"
+                                        title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">
+                                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                No hay acciones registradas.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Módulo (UNICO, fuera del loop) -->
+<div class="modal fade" id="modalEditarModulo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-start">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Módulo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formEditarModulo" data-url="">
+                <div class="modal-body">
+                    <input type="hidden" id="editModuloId" name="cod_modulo">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" id="editModuloNombre" name="nombre_modulo" class="form-control input-nombre-modulo" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Estatus</label>
+                        <select id="editModuloEstatus" name="estatus" class="form-select">
+                            <option value="1">Activo</option>
+                            <option value="0">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Acción (UNICO, fuera del loop) -->
+<div class="modal fade" id="modalEditarAccion" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-start">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Acción</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formEditarAccion" data-url="">
+                <div class="modal-body">
+                    <input type="hidden" id="editAccionId" name="cod_accion">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre (Ej: p_crear)</label>
+                        <input type="text" id="editAccionNombre" name="nom_accion" class="form-control input-nombre-accion" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Estatus</label>
+                        <select id="editAccionEstatus" name="estatus" class="form-select">
+                            <option value="1">Activo</option>
+                            <option value="0">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Crear Módulo -->
+<div class="modal fade" id="modalCrearModulo" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Registrar Módulo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formCrearModulo" data-url="{{ url_for('config_crud.crear_modulo') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del Módulo</label>
+                        <input type="text" name="nombre_modulo" class="form-control input-nombre-modulo" placeholder="Ej: Inventario" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Registrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Crear Acción -->
+<div class="modal fade" id="modalCrearAccion" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Registrar Acción</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formCrearAccion" data-url="{{ url_for('config_crud.crear_accion') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre de la Acción</label>
+                        <input type="text" name="nom_accion" class="form-control input-nombre-accion" placeholder="Ej: p_eliminar" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Registrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dataTables.bootstrap5.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/validaciones_permisos.js') }}"></script>
+<script src="{{ url_for('static', filename='js/modulo_acciones.js') }}"></script>
+{% endblock %}

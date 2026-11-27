@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow border-0" style="border-radius: 10px;">
+                <div class="card-body p-4 p-md-5">
+                    <div class="mb-4">
+                        {% if mantenimiento %}
+                            <h3 class="text-primary fw-bold mb-1">Editar Mantenimiento Operacional</h3>
+                            <p class="text-muted mb-0">Actualiza la información del mantenimiento registrado.</p>
+                        {% else %}
+                            <h3 class="text-primary fw-bold mb-1">Registrar Mantenimiento Operacional</h3>
+                            <p class="text-muted mb-0">Llena los datos del vehículo, taller y fechas del proceso.</p>
+                        {% endif %}
+                    </div>
+
+                    <form method="POST" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold" for="placa">Vehículo</label>
+                                {% if mantenimiento %}
+                                    <input type="hidden" name="placa" value="{{ mantenimiento.placa }}">
+                                    <select id="placa" class="form-select" disabled>
+                                        <option value="{{ mantenimiento.placa }}" selected>{{ mantenimiento.placa }}</option>
+                                    </select>
+                                {% else %}
+                                    <select id="placa" name="placa" class="form-select" required>
+                                        <option value="">Seleccione un vehículo...</option>
+                                        {% for v in vehiculos %}
+                                        <option value="{{ v.placa }}">{{ v.placa }} - {{ v.estado }}</option>
+                                        {% else %}
+                                        <option value="">No hay vehículos disponibles</option>
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold" for="cod_taller">Taller</label>
+                                <select id="cod_taller" name="cod_taller" class="form-select" required>
+                                    <option value="">Seleccione un taller...</option>
+                                    {% for t in talleres %}
+                                    <option value="{{ t.cod_taller }}" {% if mantenimiento and mantenimiento.cod_taller == t.cod_taller %}selected{% endif %}>{{ t.nombre_taller }}</option>
+                                    {% else %}
+                                    <option value="">No hay talleres activos</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold" for="quien_autoriza">Quién Autoriza</label>
+                                <select id="quien_autoriza" name="quien_autoriza" class="form-select" required>
+                                    <option value="">Seleccione un usuario...</option>
+                                    {% for u in usuarios_autorizadores %}
+                                    <option value="{{ u.cedula_usuario }}" {% if mantenimiento and mantenimiento.quien_autoriza == u.cedula_usuario %}selected{% endif %}>{{ u.nombre }} {{ u.apellido }} - {{ u.nombre_rol }}</option>
+                                    {% else %}
+                                    <option value="">No hay usuarios autorizadores</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold" for="tipo">Tipo de Mantenimiento</label>
+                                <select id="tipo" name="tipo" class="form-select" required>
+                                    <option value="">Seleccione tipo...</option>
+                                    <option value="Preventivo" {% if mantenimiento and mantenimiento.tipo == 'Preventivo' %}selected{% endif %}>Preventivo</option>
+                                    <option value="Correctivo" {% if mantenimiento and mantenimiento.tipo == 'Correctivo' %}selected{% endif %}>Correctivo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold" for="fecha_solicitud">Fecha de Solicitud</label>
+                                <input type="date" id="fecha_solicitud" name="fecha_solicitud" class="form-control" required value="{% if mantenimiento %}{{ mantenimiento.fecha_solicitud }}{% endif %}">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold" for="fecha_completada">Fecha de Completada <span class="text-muted fw-normal">(Opcional)</span></label>
+                                <input type="date" id="fecha_completada" name="fecha_completada" class="form-control" value="{% if mantenimiento %}{{ mantenimiento.fecha_completada }}{% endif %}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" for="descripcion_general">Descripción General</label>
+                            <textarea id="descripcion_general" name="descripcion_general" class="form-control" rows="4" required placeholder="Describe detalladamente el mantenimiento a realizar...">{% if mantenimiento %}{{ mantenimiento.descripcion_general }}{% endif %}</textarea>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="text-primary fw-bold mb-3">Detalles del Mantenimiento</h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold" for="costo_base">Costo Base($) (Presupuesto) <span class="text-muted fw-normal">(Opcional)</span></label>
+                                <input type="number" step="0.01" id="costo_base" name="costo_base" class="form-control" value="{% if mantenimiento and mantenimiento.costo_base %}{{ mantenimiento.costo_base }}{% endif %}">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold" for="costo_final">Costo Final($) <span class="text-muted fw-normal">(Opcional)</span></label>
+                                <input type="number" step="0.01" id="costo_final" name="costo_final" class="form-control" value="{% if mantenimiento and mantenimiento.costo_final %}{{ mantenimiento.costo_final }}{% endif %}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Detalles del Mantenimiento <span class="text-muted fw-normal">(Opcional)</span></label>
+                            <div id="contenedor-detalles">
+                                {% if detalles %}
+                                    {% for d in detalles %}
+                                    <div class="row detalle-item mb-2">
+                                        <div class="col-md-8">
+                                            <input type="text" name="descripcion_detalle_{{ loop.index0 }}" class="form-control" placeholder="Descripción detallada" value="{{ d.descripcion_detalle }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="number" name="cantidad_{{ loop.index0 }}" class="form-control" placeholder="Cantidad" value="{{ d.cantidad }}">
+                                        </div>
+                                        <div class="col-md-1">
+                                            {% if loop.index0 > 0 %}
+                                            <button type="button" class="btn btn-danger btn-sm btn-eliminar-detalle">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                <div class="row detalle-item mb-2">
+                                    <div class="col-md-8">
+                                        <input type="text" name="descripcion_detalle_0" class="form-control" placeholder="Descripción detallada">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="number" name="cantidad_0" class="form-control" placeholder="Cantidad">
+                                    </div>
+                                    <div class="col-md-1"></div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <button type="button" id="btn-agregar-detalle" class="btn btn-success btn-sm mt-2">
+                                <i class="bi bi-plus-circle"></i> Agregar otro detalle
+                            </button>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary px-4">
+                                {% if mantenimiento %}Actualizar{% else %}Guardar{% endif %}
+                            </button>
+                            <a href="{{ url_for('mantenimiento_operacional.listar_mantenimiento') }}" class="btn btn-secondary px-4">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div id="flash-messages" style="display: none;">
+            {% for category, message in messages %}
+                <div data-category="{{ category }}" data-message="{{ message }}"></div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ url_for('static', filename='js/validar_mantenimiento_operacional.js') }}"></script>
+{% endblock %}
+`

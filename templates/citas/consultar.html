@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Citas{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/flatpickr.min.css') }}">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<style>
+    @media (max-width: 992px) {
+        #tablaCitas {
+            font-size: 0.78rem;
+        }
+        #tablaCitas .btn-sm {
+            padding: 0.15rem 0.35rem;
+            font-size: 0.7rem;
+        }
+        #tablaCitas th, #tablaCitas td {
+            padding: 0.35rem 0.25rem;
+            white-space: nowrap;
+        }
+    }
+</style>
+
+<!-- Contenedor fluido a pantalla completa igual a Mantenimiento, Compras e Insumos -->
+<div class="container-fluid mt-4 px-4">
+
+    <!-- Barra de acciones superior alineada a la derecha -->
+    <div class="d-flex justify-content-end mb-3 gap-2 flex-wrap">
+        <a class="btn btn-primary shadow-sm fw-bold d-flex align-items-center gap-2" href="{{ url_for('citas.agendar') }}">
+            <i class="bi bi-plus-circle me-1"></i> Agendar Nueva Cita
+        </a>
+    </div>
+
+    <!-- Tarjeta con esquinas redondeadas y encabezado oscuro -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-dark text-white p-3 border-0 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold d-flex align-items-center">
+                <i class="bi bi-calendar3 me-2 text-primary"></i>
+                Gestión de Citas
+            </h5>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 nowrap" id="tablaCitas" style="width:100%;">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="py-3">ID</th>
+                            <th class="py-3">Fecha</th>
+                            <th class="py-3">Hora</th>
+                            <th class="py-3 text-center">Estado</th>
+                            <th class="py-3">Marca</th>
+                            <th class="py-3">Modelo</th>
+                            <th class="py-3 text-center">N° de Placa</th>
+                            {% if session.get('cod_rol') == 1 %}
+                                <th class="py-3">Nombre del cliente</th>
+                                <th class="py-3">Cédula</th>
+                                <th class="py-3">Teléfono</th>
+                            {% endif %}
+                            <th class="py-3 text-center">Foto</th>
+                            <th class="py-3 text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cita in citas %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-dark rounded-2 px-2 py-1 fs-7 font-monospace">
+                                    #{{ cita.cod_citas }}
+                                </span>
+                            </td>
+                            <td>{{ cita.fecha }}</td>
+                            <td class="font-monospace">{{ cita.hora }}</td>
+                            <td class="text-center">
+                                {% if cita.estado|lower == 'finalizada' %}
+                                    <span class="badge rounded-pill bg-success px-3">
+                                        <i class="bi bi-check-circle-fill me-1"></i>Finalizada
+                                    </span>
+                                {% elif cita.estado|lower == 'pendiente' %}
+                                    <span class="badge rounded-pill bg-warning text-dark px-3">
+                                        <i class="bi bi-clock-history me-1"></i>Pendiente
+                                    </span>
+                                {% else %}
+                                    <span class="badge rounded-pill bg-danger px-3">
+                                        <i class="bi bi-x-circle me-1"></i>{{ cita.estado }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="fw-semibold text-dark">{{ cita.nombre_marca }}</td>
+                            <td>{{ cita.nombre_modelo }}</td>
+                            <td class="text-center">
+                                <span class="fw-bold text-dark">{{ cita.placa }}</span>
+                            </td>
+                            
+                            {% if session.get('cod_rol') == 1 %}
+                                <td class="fw-semibold text-dark">{{ cita.nombre }} {{ cita.apellido }}</td>
+                                <td>{{ cita.cedula_usuario }}</td>
+                                <td>{{ cita.telefono }}</td>
+                            {% endif %}
+                            
+                            <td class="text-center">
+                                <button type="button" 
+                                        class="btn btn-sm btn-outline-info rounded-2 btn-ver-foto" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalFotoVehiculo"
+                                        data-imagen="{% if cita.imagen_url %}{{ url_for('static', filename=cita.imagen_url) }}{% endif %}"
+                                        data-titulo="{{ cita.nombre_marca }} {{ cita.nombre_modelo }} ({{ cita.placa }})"
+                                        title="Ver foto del vehículo">
+                                    <i class="bi bi-image"></i>
+                                </button>
+                            </td>
+
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-1">
+                                    {% if session.get('cod_rol') == 1 %}
+                                        <button type="button" class="btn btn-sm btn-outline-primary rounded-2 btn-editar-cita" title="Modificar Cita" 
+                                                data-bs-toggle="modal" data-bs-target="#modalModificar" 
+                                                data-cod="{{ cita.cod_citas }}" 
+                                                data-fecha="{{ cita.fecha }}" 
+                                                data-hora="{{ cita.hora }}"
+                                                data-estado="{{ cita.estado }}">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-2 btn-cancelar-cita" data-cod="{{ cita.cod_citas }}" title="Eliminar Cita">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+
+                                        {% if cita.estado|lower != 'finalizada' %}
+                                        <button type="button" class="btn btn-sm btn-outline-success rounded-2 btn-disparar-finalizar" data-cod="{{ cita.cod_citas }}" title="Finalizar Cita">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                        {% endif %}
+                                    {% elif session.get('cod_rol') == 4 %}
+                                        {% if cita.estado|lower == 'pendiente' %}
+                                            <button type="button" class="btn btn-sm btn-outline-primary rounded-2 btn-editar-cita" title="Modificar Hora" 
+                                                    data-bs-toggle="modal" data-bs-target="#modalModificar" 
+                                                    data-cod="{{ cita.cod_citas }}" 
+                                                    data-fecha="{{ cita.fecha }}" 
+                                                    data-hora="{{ cita.hora }}"
+                                                    data-estado="{{ cita.estado }}">
+                                                <i class="bi bi-clock"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger rounded-2 btn-cancelar-cita" data-cod="{{ cita.cod_citas }}" title="Cancelar Cita">
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
+                                        {% else %}
+                                            <span class="text-muted small">Sin acciones</span>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Foto Vehículo -->
+<div class="modal fade" id="modalFotoVehiculo" tabindex="-1" aria-labelledby="modalFotoVehiculoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="modalFotoVehiculoLabel">
+                    <i class="bi bi-image me-2"></i><span id="tituloFotoVehiculo">Foto del Vehículo</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center p-4" id="cuerpoFotoVehiculo">
+                <p class="text-muted">Cargando...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Reprogramar Cita -->
+<div class="modal fade" id="modalModificar" tabindex="-1" aria-labelledby="modalModificarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="modalModificarLabel"><i class="bi bi-pencil-square text-primary me-2"></i>Reprogramar Cita</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <form action="" id="formModificarCita" method="POST">
+                <div class="modal-body text-start">
+                    <div class="mb-3">
+                        <label class="form-label text-muted fw-semibold">Código de Cita</label>
+                        <input type="text" id="modal_cod_cita" class="form-control bg-light" readonly>
+                    </div>
+                    
+                    {% if session.get('cod_rol') == 1 %}
+                        <div class="mb-3">
+                            <label for="modal_fecha" class="form-label fw-semibold">Nueva Fecha</label>
+                            <input type="text" id="modal_fecha" name="fecha" class="form-control" required>
+                            <div class="invalid-feedback">Seleccione una fecha válida.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modal_hora" class="form-label fw-semibold">Nueva Hora</label>
+                            <input type="text" id="modal_hora" name="hora" class="form-control" required>
+                            <div class="invalid-feedback">Seleccione una hora válida (8:00 - 18:00).</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modal_estado" class="form-label fw-semibold">Estado de la Cita</label>
+                            <select id="modal_estado" name="estado" class="form-select" required>
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="Finalizada">Finalizada</option>
+                            </select>
+                            <div class="invalid-feedback">Seleccione un estado.</div>
+                        </div>
+                    {% else %}
+                        <div class="mb-3">
+                            <label class="form-label text-muted fw-semibold">Fecha de Cita (Bloqueada)</label>
+                            <input type="text" id="modal_fecha" name="fecha" class="form-control bg-light" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modal_hora" class="form-label fw-semibold">Nueva Hora</label>
+                            <input type="text" id="modal_hora" name="hora" class="form-control border-primary" required>
+                            <div class="invalid-feedback">Seleccione una hora válida (8:00 - 18:00).</div>
+                        </div>
+                        <input type="hidden" id="modal_estado" name="estado" value="Pendiente">
+                    {% endif %}
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary fw-bold" id="btn-guardar-modificar-cita"><i class="bi bi-save me-1"></i> Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="{{ url_for('static', filename='js/flatpickr.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/flatpickr.es.js') }}"></script>
+<script src="{{ url_for('static', filename='js/consultar_cita.js') }}"></script>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="flask-msg-data" 
+           data-message="{{ message }}" 
+           data-category="{{ category }}" 
+           style="display:none;">
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+{% endblock %}

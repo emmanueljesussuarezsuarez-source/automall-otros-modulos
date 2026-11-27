@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de Compra #{{ compra.cod_compras }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flask-msg-data" data-message="{{ message }}" data-category="{{ category }}" style="display:none;"></div>
+        {% endfor %}
+    {% endwith %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="bi bi-receipt"></i> Compra #{{ compra.cod_compras }}</h4>
+                    <div>
+                        {% if compra.estado == 'Completada' %}
+                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Completada</span>
+                        {% elif compra.estado == 'Anulada' %}
+                            <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Anulada</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Pendiente</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p><strong>Fecha:</strong> {{ compra.fecha_compra }}</p>
+                            <p><strong>Proveedor:</strong> {{ compra.proveedor or 'Sin proveedor' }}</p>
+                            <p><strong>Tipo:</strong> {{ compra.tipo_compra }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Observaciones:</strong> {{ compra.observaciones or 'Ninguna' }}</p>
+                        </div>
+                    </div>
+
+                    <h5><i class="bi bi-list-ul"></i> Insumos Agregados</h5>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Insumo</th>
+                                    <th>Unidad</th>
+                                    <th class="text-center">Cantidad</th>
+                                    {% if compra.estado == 'Pendiente' %}
+                                    <th class="text-center">Acciones</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for d in compra.detalles %}
+                                <tr>
+                                    <td>{{ d.nombre_insumo }}</td>
+                                    <td>{{ d.unidad_medida or '-' }}</td>
+                                    <td class="text-center">{{ d.cantidad }}</td>
+                                    {% if compra.estado == 'Pendiente' %}
+                                    <td class="text-center">
+                                        <form action="{{ url_for('compras.eliminar_detalle',
+                                                                  cod_compras=compra.cod_compras,
+                                                                  cod_det_compra=d.cod_det_compra) }}"
+                                              method="POST" class="d-inline"
+                                              data-confirm="Se devolverán {{ d.cantidad }} unidades de '{{ d.nombre_insumo }}' al stock."
+                                              data-confirm-title="¿Eliminar insumo del detalle?">
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="{% if compra.estado == 'Pendiente' %}4{% else %}3{% endif %}"
+                                        class="text-center text-muted py-4">
+                                        <i class="bi bi-info-circle"></i> No hay insumos agregados.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if compra.estado == 'Pendiente' %}
+                    <div class="card mt-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Agregar Insumo</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST"
+                                  action="{{ url_for('compras.agregar_insumo', cod_compras=compra.cod_compras) }}">
+                                <div class="row">
+                                    <div class="col-md-8 mb-3">
+                                        <label class="form-label">Insumo *</label>
+                                        <select name="cod_insumo" class="form-select" required>
+                                            <option value="">-- Seleccionar insumo --</option>
+                                            {% for i in insumos %}
+                                            <option value="{{ i.cod_insumo }}">
+                                                {{ i.nombre_insumo }} (Stock: {{ i.stock }} {{ i.unidad_medida or '' }})
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">Cantidad *</label>
+                                        <input type="number" name="cantidad"
+                                               class="form-control" min="1" value="1" required>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="bi bi-plus-circle"></i> Agregar Insumo
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="card-footer d-flex justify-content-between">
+                    <a href="{{ url_for('compras.listar') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                    <div>
+                        {% if compra.estado == 'Pendiente' and compra.detalles %}
+                        <form action="{{ url_for('compras.finalizar', cod_compras=compra.cod_compras) }}"
+                              method="POST" class="d-inline"
+                              data-confirm="Se marcará la compra como Completada y ya no podrá modificarse."
+                              data-confirm-title="¿Finalizar compra?"
+                              data-confirm-button="Sí, finalizar"
+                              data-confirm-color="#198754">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Finalizar Compra
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const iconMap = { success:'success', danger:'error', warning:'warning', info:'info', message:'info' };
+
+    document.querySelectorAll('.flask-msg-data').forEach(el => {
+        const msg = el.dataset.message;
+        const cat = (el.dataset.category || 'info').toLowerCase();
+        if (!msg) return;
+        Swal.fire({
+            icon: iconMap[cat] || 'info',
+            title: msg,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3500,
+            timerProgressBar: true
+        });
+    });
+
+    document.addEventListener('submit', (e) => {
+        const form = e.target;
+        if (!form.dataset.confirm) return;
+        e.preventDefault();
+        Swal.fire({
+            title: form.dataset.confirmTitle || '¿Está seguro?',
+            text: form.dataset.confirm,
+            icon: form.dataset.confirmIcon || 'warning',
+            showCancelButton: true,
+            confirmButtonText: form.dataset.confirmButton || 'Sí, continuar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: form.dataset.confirmColor || '#dc3545',
+            cancelButtonColor: '#6c757d',
+            reverseButtons: true,
+            focusCancel: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.removeAttribute('data-confirm');
+                form.submit();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

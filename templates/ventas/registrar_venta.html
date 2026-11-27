@@ -1,0 +1,485 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4 mb-5 px-4">
+    <div class="card shadow-lg border-0 mx-auto" style="max-width: 1100px; border-radius: 20px; overflow: hidden;">
+        
+        <div class="card-header bg-dark text-white p-4 text-center border-0">
+            <h3 class="fw-bold mb-1">Registro de Ventas y Facturación</h3>
+            <p class="text-white small mb-0">Complete los pasos para procesar la transacción y generar la factura (PDF)</p>
+        </div>
+
+        <div class="card-body p-5">
+            <form action="{{ url_for('ventas.registrar_venta') }}" method="POST" id="form-venta" autocomplete="off">
+                <input type="hidden" name="tasa_bcv" id="tasa_bcv" value="{{ tasa_actual }}">
+                
+                <!-- PASO 1: CLIENTE -->
+                <div class="step-pane" id="step-1">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-primary text-white rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">1</div>
+                        <h5 class="fw-bold mb-0 text-secondary">Identificación y Registro del Cliente</h5>
+                    </div>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                                <label class="form-label small fw-bold text-uppercase text-muted mb-0">
+                                    Tipo de Cliente
+                                </label>
+
+                                <div class="d-flex gap-2 align-items-center flex-wrap mb-3">
+                                    <button type="button"
+                                            class="btn btn-primary btn-sm"
+                                            id="btn_cliente_existente"
+                                            onclick="toggleModoCliente('existente')">
+                                        <i class="bi bi-person-check me-1"></i>
+                                        Cliente existente
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn btn-success btn-sm"
+                                            onclick="abrirModalClienteRapido()">
+                                        <i class="bi bi-person-plus me-1"></i>
+                                        Registrar nuevo cliente
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="seccion_cliente_existente">
+                                <div class="mb-3 text-start">
+                                    <label class="form-label small fw-bold text-uppercase text-muted">Buscar por Cédula, RIF o Nombre</label>
+                                    <div class="input-group shadow-sm">
+                                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                                        <input type="text"
+                                            id="buscar_cliente"
+                                            class="form-control border-start-0"
+                                            placeholder="Escribe una cédula, RIF o nombre..."
+                                            autocomplete="off"
+                                            oninput="filtrarClientesEnTiempoReal()">
+
+                                        <button class="btn btn-primary px-4"
+                                                type="button"
+                                                id="btn_buscar_cliente">
+                                            Buscar
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="resultados_busqueda_clientes"
+                                    class="list-group shadow-sm mt-1"
+                                    style="display: none; max-height: 240px; overflow-y: auto;">
+                                </div>
+
+                                <div class="mb-4 text-start">
+                                    <label class="form-label small fw-bold text-uppercase text-muted">O seleccionar de la lista</label>
+                                    <select class="form-select shadow-sm" id="select_cliente_lista" onchange="seleccionarClienteDeLista(this)">
+                                        <option value="" disabled selected>Clientes Registrados...</option>
+                                        {% for cliente in clientes %}
+                                            <option value="{{ cliente.cedula_usuario }}">{{ cliente.nombre }} {{ cliente.apellido }} (V-{{ cliente.cedula_usuario }})</option>
+                                        {% endfor %}
+                                    </select>
+                                    <input type="hidden" name="cedula_cliente" id="id_cliente_hidden">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="p-4 bg-light border-0 rounded-4 text-start small shadow-sm h-100">
+                                <h6 class="fw-bold text-muted mb-3 text-uppercase"><i class="bi bi-person-lines-fill me-2"></i>Información del Comprador</h6>
+                                <div class="row g-3" id="vista_previa_cliente">
+                                    <div class="col-12"><strong>Documento (C.I/RIF):</strong> <span id="lbl_cliente_doc" class="text-dark">-</span></div>
+                                    <div class="col-6"><strong>Nombre:</strong> <span id="lbl_cliente_nombre" class="d-block text-truncate text-primary fw-bold">-</span></div>
+                                    <div class="col-6"><strong>Apellido:</strong> <span id="lbl_cliente_apellido" class="d-block text-truncate text-primary fw-bold">-</span></div>
+                                    <div class="col-6"><strong>Teléfono:</strong> <span id="lbl_cliente_telefono" class="d-block">-</span></div>
+                                    <div class="col-12"><strong>Correo:</strong> <span id="lbl_cliente_correo" class="d-block text-truncate">-</span></div>
+                                    <div class="col-12"><strong>Dirección:</strong> <span id="lbl_cliente_direccion" class="d-block text-muted">-</span></div>
+                                </div>
+                                <div class="alert alert-warning mt-3 py-2 small d-none" id="alerta_nuevo_cliente">
+                                    <i class="bi bi-info-circle me-1"></i> Se registrará un <strong>Nuevo Cliente</strong> al finalizar la venta.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 text-end">
+                        <button type="button" class="btn btn-primary btn-lg fw-bold px-5 py-3 shadow" id="btn_ir_paso_2">Siguiente Paso <i class="bi bi-arrow-right ms-2"></i></button>
+                    </div>
+                </div>
+
+                <!-- PASO 2: VEHÍCULO Y DOCUMENTOS -->
+                <div class="step-pane d-none" id="step-2">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-primary text-white rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">2</div>
+                        <h5 class="fw-bold mb-0 text-secondary">Vehículo y Documentos</h5>
+                    </div>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6 text-start">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Buscar por Placa</label>
+                                <div class="input-group shadow-sm mb-3">
+                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                                    <input type="text" id="buscar_placa" class="form-control border-start-0 text-uppercase" placeholder="Escriba placa...">
+                                    <button class="btn btn-outline-primary" type="button" id="btn_buscar_placa" onclick="buscarVehiculoPorPlaca()">Buscar</button>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">O seleccionar de la lista</label>
+                                <select class="form-select shadow-sm" id="select_vehiculo_lista" onchange="seleccionarDeLista(this)">
+                                    <option value="" disabled selected>Vehículos Disponibles...</option>
+                                    {% for vehiculo in vehiculos %}
+                                        <option value="{{ vehiculo.placa }}">{{ vehiculo.marca }} {{ vehiculo.modelo }} ({{ vehiculo.placa }})</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="hidden" name="placa" id="id_vehiculo_hidden" required>
+                            </div>
+
+                            <div class="p-4 bg-light border-0 rounded-4 text-start small shadow-sm">
+                                <h6 class="fw-bold text-muted mb-3 text-uppercase">Garantías y Legalidad</h6>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" name="poder" id="tiene_poder" value="1">
+                                    <label class="form-check-label fw-bold" for="tiene_poder">¿Posee Poder Legal Autorizado?</label>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="traspaso_papel" id="traspaso_papel" value="1">
+                                    <label class="form-check-label fw-bold" for="traspaso_papel">¿Documentación de Traspaso Lista?</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TARJETA DETALLE VEHÍCULO -->
+                        <div class="col-md-6">
+                            <div class="card border-0 bg-dark text-white h-100 shadow" style="border-radius: 15px; overflow: hidden;">
+                                <div id="v_foto_container" class="text-center bg-black position-relative" style="height: 180px; display: none; align-items: center; justify-content: center; overflow: hidden;">
+                                    <img id="v_foto_img" src="" alt="Foto Vehículo" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+
+                                <div class="card-body p-4 text-start d-flex flex-column justify-content-between">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-4">
+                                            <h4 id="v_marca_modelo" class="fw-bold mb-0 text-warning">Seleccione un Vehículo</h4>
+                                            <span id="v_precio" class="badge bg-success fs-5 px-3 py-2">$ 0.00</span>
+                                        </div>
+                                        <hr class="border-secondary mb-4">
+                                        <div class="row g-4 fs-6">
+                                            <div class="col-6"><i class="bi bi-car-front text-info me-2"></i><strong>Carrocería:</strong> <span id="v_tipo" class="d-block mt-1 text-white-50">-</span></div>
+                                            <div class="col-6"><i class="bi bi-calendar-check text-info me-2"></i><strong>Año / Color:</strong> <span id="v_anio_color" class="d-block mt-1 text-white-50">-</span></div>
+                                            <div class="col-12"><i class="bi bi-info-circle text-info me-2"></i><strong>Condición Técnica:</strong> <span id="v_estado" class="d-block mt-1 text-white-50">-</span></div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="v_precio_raw" name="precio_vehiculo" value="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-5">
+                        <button type="button" class="btn btn-light btn-lg fw-bold px-5 py-3 border" id="btn_volver_paso_1">Volver</button>
+                        <button type="button" class="btn btn-primary btn-lg fw-bold px-5 py-3 shadow" id="btn_ir_paso_3">Siguiente Paso</button>
+                    </div>
+                </div>
+
+                <!-- PASO 3: ESTRUCTURA FINANCIERA Y CUOTAS -->
+                <div class="step-pane d-none" id="step-3">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-primary text-white rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">3</div>
+                        <h5 class="fw-bold mb-0 text-secondary">Estructura Financiera de Venta</h5>
+                    </div>
+                    
+                    <div class="row g-4 text-start small">
+                        <!-- COLUMNA IZQUIERDA: MODALIDAD Y PASARELA DE PAGO -->
+                        <div class="col-md-6 border-end pe-md-4">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-muted text-uppercase small">Modalidad de Ejecución Comercial</label>
+                                <select class="form-select form-select-lg" name="tipo_venta" id="tipo_operacion" required>
+                                    <option value="contado" selected>Pago de Contado (Completo)</option>
+                                    <option value="credito">Plan de Crédito por Cuotas</option>
+                                </select>
+                            </div>
+
+                            <div class="row g-3 mb-3" id="bloque_datos_pago_inicial">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-muted text-uppercase small">Pasarela / Método de Pago</label>
+                                    <select class="form-select fw-bold text-primary" name="cod_metodo" id="cod_metodo" required>
+                                        <option value="" disabled selected>Elegir método...</option>
+                                        {% for metodo in metodos_pago %}
+                                            <option value="{{ metodo.cod_metodo }}" data-requiere-ref="{{ metodo.requiere_referencia }}">{{ metodo.nombre_metodo }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6" id="wrapper_moneda">
+                                    <label class="form-label fw-bold text-muted text-uppercase small">Moneda de Recepción</label>
+                                    <select class="form-select" name="cod_moneda" id="cod_moneda">
+                                        {% for mnd in monedas %}
+                                            <option value="{{ mnd.cod_moneda }}" data-simbolo="{{ mnd.simbolo }}">{{ mnd.nombre_moneda }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12 p-0 my-2">
+                                <div class="row g-3">
+                                    <div class="col-12" id="wrapper_banco">
+                                        <div class="p-3 shadow-sm rounded-3 bg-light border">
+                                            <label class="form-label fw-bold text-muted text-uppercase small m-0 mb-2">Banco / Plataforma de Destino</label>
+                                            <select class="form-select" name="cod_banco" id="cod_banco">
+                                                {% for bco in bancos %}
+                                                    <option value="{{ bco.cod_banco }}">{{ bco.nombre_banco }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12" id="wrapper_moneda_digital" style="display: none;">
+                                        <div class="p-3 shadow-sm rounded-3 bg-warning bg-opacity-10 border border-warning">
+                                            <label class="form-label fw-bold text-dark text-uppercase small m-0 mb-2">
+                                                <i class="bi bi-wallet2 me-2 text-warning"></i>Billetera / Plataforma Digital Destino
+                                            </label>
+                                            <select class="form-select border-warning fw-bold text-dark" name="cod_mon_digital" id="cod_mon_digital">
+                                                <option value="" disabled selected>Seleccione Plataforma...</option>
+                                                {% for mon in monedas_digitales %}
+                                                    <option value="{{ mon.cod_mon_digital }}" data-simbolo="{{ mon.simbolo_digital }}">{{ mon.nombre_digital }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 p-0 mt-3" id="wrapper_referencia">
+                                <label class="form-label fw-bold text-muted text-uppercase small" id="label_referencia">Nro. de Referencia</label>
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-hash"></i></span>
+                                    <input type="text" name="referencia" id="referencia" class="form-control border-start-0" placeholder="Ej. 12345678">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- COLUMNA DERECHA: TOTALES, INICIAL Y CONFIGURACIÓN DE CUOTAS -->
+                        <div class="col-md-6 ps-md-4 d-flex flex-column justify-content-between">
+                            <div class="mb-4 p-4 bg-primary bg-opacity-10 text-center rounded-4 border border-primary border-opacity-25 shadow-sm">
+                                <span class="small text-primary d-block fw-bold mb-2" id="label_total_convertido">TOTAL EXIGIBLE DE LA VENTA</span>
+                                
+                                <div class="row align-items-center g-2">
+                                    <div class="col-6 border-end">
+                                        <small class="text-muted text-uppercase fw-bold d-block" style="font-size: 0.75rem;">Monto USD</small>
+                                        <span class="fs-4 fw-bold text-dark" id="total_visual_usd">$ 0.00</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted text-uppercase fw-bold d-block" style="font-size: 0.75rem;">Monto VES</small>
+                                        <span class="fs-4 fw-bold text-primary" id="total_visual_ves">Bs. 0.00</span>
+                                    </div>
+                                </div>
+                                
+                                <hr class="my-3 opacity-25">
+                                <span class="fs-3 fw-bold text-success d-block my-2" id="resumen_total">$ 0.00</span>
+                                <small class="text-muted d-block fw-bold" id="info_tasa_bcv">Tasa BCV del día: Bs. {{ tasa_actual }}</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-primary text-uppercase small mb-1" id="label_monto_dinamico">Monto Líquido a Recibir</label>
+                                <small class="text-muted d-block mb-2 d-none" id="hint_inicial_credito">En ventas a crédito puedes ingresar la inicial (o 0.00 si no deja inicial).</small>
+                                <div class="input-group input-group-lg shadow-sm">
+                                    <span class="input-group-text bg-white fw-bold text-primary" id="simbolo_moneda">$</span>
+                                    <input type="number" name="monto_recibido" id="monto_recibido" class="form-control fw-bold text-primary" placeholder="0.00" step="0.01" min="0" required>
+                                </div>
+                            </div>
+
+                            <!-- BLOQUE DE CRÉDITO POR CUOTAS -->
+                            <div id="wrapper_credito" class="p-4 bg-danger bg-opacity-10 border border-danger border-opacity-25 rounded-4 mb-4 d-none shadow-sm">
+                                <h6 class="fw-bold text-danger text-uppercase mb-3">
+                                    <i class="bi bi-calendar2-week me-2"></i>Configuración del Plan de Cuotas
+                                </h6>
+
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-dark small text-uppercase">Frecuencia</label>
+                                        <select name="frecuencia_pago" id="frecuencia_pago" class="form-select">
+                                            <option value="Semanal">Semanal</option>
+                                            <option value="Quincenal">Quincenal</option>
+                                            <option value="Mensual" selected>Mensual</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-dark small text-uppercase">N° de Cuotas</label>
+                                        <input type="number" name="cantidad_cuotas" id="cantidad_cuotas" class="form-control" min="1" max="120" value="3">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-dark small text-uppercase">Interés (%)</label>
+                                        <input type="number" name="tasa_interes" id="tasa_interes" class="form-control" min="0" max="100" step="0.01" value="0">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-dark small text-uppercase">Fecha 1ra Cuota</label>
+                                        <input type="date" name="fecha_inicio_cuotas" id="fecha_inicio_cuotas" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-dark small text-uppercase">Fecha Límite Final</label>
+                                        <input type="date" name="fecha_vencimiento" id="fecha_vencimiento" class="form-control">
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-danger small text-uppercase">Saldo a Financiar en Cuotas</label>
+                                        <div class="d-flex justify-content-around bg-white p-2 rounded border mt-1">
+                                            <span class="fw-bold text-dark" id="deuda_usd">USD: $0.00</span>
+                                            <span class="fw-bold text-danger" id="deuda_ves">VES: Bs. 0.00</span>
+                                        </div>
+                                        <input type="hidden" id="saldo_pendiente" name="deuda_pendiente" value="0.00">
+                                        <input type="hidden" id="deuda_total_credito" name="deuda_total_credito" value="0.00">
+                                        <input type="hidden" id="cuotas_json" name="cuotas_json" value="[]">
+                                    </div>
+
+                                    <!-- PREVISUALIZACIÓN DE CUOTAS -->
+                                    <div class="col-12 mt-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="fw-bold text-dark small text-uppercase">
+                                                <i class="bi bi-list-check me-1"></i>Cronograma Estimado (Fechas editables)
+                                            </span>
+                                            <span class="badge bg-dark" id="badge_cuota_aprox">Cuota aprox: $0.00</span>
+                                        </div>
+                                        <div class="table-responsive bg-white rounded-3 border" style="max-height: 220px; overflow-y: auto;">
+                                            <table class="table table-sm table-hover align-middle mb-0" id="tabla_preview_cuotas">
+                                                <thead class="table-light sticky-top">
+                                                    <tr>
+                                                        <th class="ps-2">#</th>
+                                                        <th>Vencimiento</th>
+                                                        <th class="text-end">USD</th>
+                                                        <th class="text-end pe-2">VES</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tbody_preview_cuotas">
+                                                    <tr>
+                                                        <td colspan="4" class="text-center text-muted py-3">
+                                                            Configure el monto y las cuotas para previsualizar.
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-5">
+                        <button type="button" class="btn btn-light btn-lg fw-bold px-5 py-3 border" id="btn_volver_paso_2">Volver</button>
+                        <button type="submit" class="btn btn-success btn-lg fw-bold px-4 py-3 shadow" id="btn-finalizar">
+                            <i class="bi bi-file-earmark-pdf-fill me-2 fs-5"></i>Finalizar y Generar Factura
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+
+            <!-- MODAL CLIENTE RÁPIDO -->
+            <div class="modal fade" id="modalClienteRapido" tabindex="-1"
+                aria-labelledby="tituloModalClienteRapido" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="tituloModalClienteRapido">
+                                <i class="bi bi-person-plus me-2"></i>
+                                Registrar nuevo cliente
+                            </h5>
+                            <button type="button" class="btn-close"
+                                    data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+
+                        <form id="form-cliente-rapido" autocomplete="off">
+                            <div class="modal-body">
+                                <div id="alerta-cliente-rapido"
+                                    class="alert d-none" role="alert"></div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="rapido_cedula" class="form-label">Cédula</label>
+                                        <input type="text" class="form-control"
+                                            id="rapido_cedula" name="cedula"
+                                            inputmode="numeric" maxlength="10"
+                                            pattern="[0-9]{6,10}" required>
+                                        <small class="text-muted">Entre 6 y 10 dígitos.</small>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="rapido_telefono" class="form-label">Teléfono</label>
+                                        <input type="tel" class="form-control"
+                                            id="rapido_telefono" name="telefono"
+                                            inputmode="numeric"
+                                            pattern="[0-9]{7,15}" maxlength="15" required>
+                                        <small class="text-muted">Introduce solo números.</small>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="rapido_nombre" class="form-label">Nombre</label>
+                                        <input type="text" class="form-control"
+                                            id="rapido_nombre" name="nombre" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="rapido_apellido" class="form-label">Apellido</label>
+                                        <input type="text" class="form-control"
+                                            id="rapido_apellido" name="apellido" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="rapido_correo" class="form-label">Correo electrónico</label>
+                                        <input type="email" class="form-control"
+                                            id="rapido_correo" name="correo" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="rapido_direccion" class="form-label">Dirección</label>
+                                        <input type="text" class="form-control"
+                                            id="rapido_direccion" name="direccion"
+                                            minlength="5" required>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label for="rapido_password" class="form-label">Contraseña inicial del cliente</label>
+                                        <input type="password" class="form-control"
+                                            id="rapido_password" name="password"
+                                            minlength="8" autocomplete="new-password"
+                                            required>
+                                        <small class="text-muted">
+                                            Debe cumplir las reglas de seguridad de Automall.
+                                            El cliente podrá utilizarla para acceder a su cuenta.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-success" id="btn_guardar_cliente_rapido">
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    Registrar y seleccionar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body { background-color: #f4f7f6; }
+    .form-control, .form-select { border-radius: 10px; padding: 12px 15px; border: 1px solid #e0e0e0; font-size: 0.9rem; }
+    .form-control:focus, .form-select:focus { box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1); border-color: #0d6efd; }
+    .input-group-text { border-radius: 10px 0 0 10px; border: 1px solid #e0e0e0; }
+    .btn { border-radius: 10px; transition: all 0.3s; }
+    .card-header { background: linear-gradient(45deg, #1f2327, #2c3034); }
+    .step-pane { animation: fadeIn 0.4s ease-out; }
+    #tabla_preview_cuotas input[type="date"] { padding: 4px 8px; font-size: 0.8rem; border-radius: 6px; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+<script src="{{ url_for('static', filename='js/ventas.js') }}"></script>
+<script src="{{ url_for('static', filename='js/validacion_venta.js') }}"></script>
+{% endblock %}

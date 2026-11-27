@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Compra{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flask-msg-data" data-message="{{ message }}" data-category="{{ category }}" style="display:none;"></div>
+        {% endfor %}
+    {% endwith %}
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-cart-plus"></i> Nueva Compra de Insumos</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Proveedor *</label>
+                            <select name="rif_proveedor" class="form-select" required>
+                                <option value="">-- Seleccionar proveedor --</option>
+                                {% for p in proveedores %}
+                                <option value="{{ p.rif_cedula_proveedor }}">{{ p.razon_social }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="text-muted">
+                                <a href="{{ url_for('compras.nuevo_proveedor') }}">
+                                    <i class="bi bi-plus-circle"></i> Crear nuevo proveedor
+                                </a>
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de Compra</label>
+                            <select name="tipo_compra" class="form-select">
+                                <option value="Normal">Normal</option>
+                                <option value="Urgente">Urgente</option>
+                                <option value="Mantenimiento">Mantenimiento</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Observaciones</label>
+                            <textarea name="observaciones" class="form-control" rows="2"
+                                      maxlength="100"
+                                      placeholder="Máximo 100 caracteres"></textarea>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Una vez creada la compra, podrá agregar los insumos.
+                        </div>
+
+                        <div class="text-end">
+                            <a href="{{ url_for('compras.listar') }}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Crear Compra
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const iconMap = { success:'success', danger:'error', warning:'warning', info:'info', message:'info' };
+
+    document.querySelectorAll('.flask-msg-data').forEach(el => {
+        const msg = el.dataset.message;
+        const cat = (el.dataset.category || 'info').toLowerCase();
+        if (!msg) return;
+        Swal.fire({
+            icon: iconMap[cat] || 'info',
+            title: msg,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3500,
+            timerProgressBar: true
+        });
+    });
+});
+</script>
+{% endblock %}

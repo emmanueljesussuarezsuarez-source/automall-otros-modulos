@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid mt-3 px-3">
+
+    <!-- ENCABEZADO OPTIMIZADO CON FILTRO Y BOTÓN -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3 bg-white p-3 rounded-3 shadow-sm border-0">
+        <div>
+            <h4 class="fw-bold text-dark mb-0 d-flex align-items-center">
+                <i class="bi bi-wallet2 text-primary me-2"></i>
+                Control General de Pagos y Cuotas
+            </h4>
+            <p class="text-muted small mb-0 fs-7">
+                Monitoreo administrativo de abonos, cuotas programadas y cuentas de clientes
+            </p>
+        </div>
+
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <div class="input-group input-group-sm shadow-sm rounded-2 overflow-hidden" style="width: auto;">
+                <span class="input-group-text bg-white border-end-0 text-muted ps-3">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" id="inputBuscarPlaca" class="form-control border-start-0 border-end-0 bg-white text-uppercase shadow-none"
+                       placeholder="Buscar por placa..." style="max-width: 180px;">
+                <button type="button" id="btnLimpiarPlaca" class="btn btn-white border-top border-bottom border-start-0 text-muted btn-sm d-none" title="Limpiar filtro">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <a href="{{ url_for('pagos.registrar_pago') }}" class="btn btn-primary btn-sm shadow-sm px-3 fw-bold">
+                <i class="bi bi-plus-circle me-1"></i> Registrar Pago
+            </a>
+        </div>
+    </div>
+
+    <!-- PESTAÑAS: HISTORIAL DE PAGOS / CONTROL DE CUOTAS -->
+    <ul class="nav nav-pills mb-3 gap-2" id="tabsPagosAdmin" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold rounded-pill px-4" id="tab-admin-pagos-btn" data-bs-toggle="pill" data-bs-target="#pane-admin-pagos" type="button" role="tab">
+                <i class="bi bi-receipt me-1"></i> Historial de Pagos
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold rounded-pill px-4" id="tab-admin-cuotas-btn" data-bs-toggle="pill" data-bs-target="#pane-admin-cuotas" type="button" role="tab">
+                <i class="bi bi-calendar2-week me-1"></i> Control de Cuotas y Cobranza
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- PESTAÑA 1: TABLA DE PAGOS -->
+        <div class="tab-pane fade show active" id="pane-admin-pagos" role="tabpanel">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover align-middle mb-0 text-nowrap" style="font-size: 0.875rem;">
+                        <thead class="bg-light text-muted small text-uppercase">
+                            <tr>
+                                <th class="ps-3 py-2">Cliente</th>
+                                <th class="py-2">Contacto</th>
+                                <th class="py-2">Vehículo</th>
+                                <th class="py-2">Detalle del Pago</th>
+                                <th class="py-2 text-center">Estado de Cuenta</th>
+                                <th class="pe-3 py-2 text-end">Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="tablaPagosBody">
+                            {% for p in pagos %}
+                            {% set estado_del_pago = p.estado_pago|default(p.estado, true)|string|lower|trim %}
+
+                            <tr class="fila-pago" data-placa="{{ p.placa|upper }}">
+                                <!-- CLIENTE -->
+                                <td class="ps-3 py-2">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex justify-content-center align-items-center me-2 fw-bold text-uppercase fs-7"
+                                             style="width: 32px; height: 32px; min-width: 32px;">
+                                            {{ p.nombre[:1] }}{{ p.apellido[:1] }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark text-capitalize lh-1 mb-1">
+                                                {{ p.nombre }} {{ p.apellido }}
+                                            </div>
+                                            <span class="text-muted fs-7">C.I: {{ p.cedula }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- CONTACTO -->
+                                <td class="py-2">
+                                    <div class="lh-1">
+                                        <span class="d-block mb-1 fs-7">
+                                            <i class="bi bi-telephone text-muted me-1"></i>{{ p.telefono }}
+                                        </span>
+                                        <span class="d-block text-truncate text-muted fs-7" style="max-width: 140px;" title="{{ p.direccion }}">
+                                            <i class="bi bi-geo-alt me-1"></i>{{ p.direccion }}
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <!-- VEHÍCULO -->
+                                <td class="py-2">
+                                    <span class="badge bg-secondary bg-opacity-10 text-dark border px-2 py-1 fs-7 fw-normal">
+                                        <i class="bi bi-car-front me-1 text-muted"></i>{{ p.placa }}
+                                    </span>
+                                    {% if p.frecuencia_pago and p.frecuencia_pago != 'Contado' %}
+                                        <div class="text-muted" style="font-size: 0.7rem;">
+                                            {{ p.cantidad_cuotas | default(1) }} cuotas ({{ p.frecuencia_pago }})
+                                        </div>
+                                    {% endif %}
+                                </td>
+
+                                <!-- DETALLE DEL PAGO -->
+                                <td class="py-2">
+                                    <div class="d-flex flex-column lh-sm">
+                                        <span class="fw-bold text-success">
+                                            ${{ "{:,.2f}".format(p.monto_abonado|default(0, true)|float) }}
+                                        </span>
+                                        <span class="text-muted fs-7">
+                                            {{ p.fecha_pago.strftime('%d/%m/%Y') if p.fecha_pago else 'Sin fecha' }} • {{ p.nombre_metodo }}
+                                        </span>
+                                        {% if p.cuotas_aplicadas %}
+                                            <span class="text-primary" style="font-size: 0.72rem;">
+                                                <i class="bi bi-calendar-check me-1"></i>{{ p.cuotas_aplicadas }}
+                                            </span>
+                                        {% endif %}
+                                        {% if p.referencia %}
+                                            <span class="text-secondary fs-7">Ref: {{ p.referencia }}</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+
+                                <!-- ESTADO -->
+                                <td class="text-center py-2">
+                                    {% if estado_del_pago == 'anulado' %}
+                                        <div class="d-inline-flex align-items-center gap-1">
+                                            <span class="badge bg-danger rounded-pill px-2 py-1">
+                                                <i class="bi bi-x-circle me-1"></i>Anulado
+                                            </span>
+                                            {% if p.descripcion %}
+                                                <i class="bi bi-info-circle-fill text-danger fs-6 cursor-pointer"
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-placement="top"
+                                                   title="Motivo: {{ p.descripcion }}"></i>
+                                            {% endif %}
+                                        </div>
+                                    {% elif p.estado_cuenta|default('', true)|lower|trim == 'pagado' %}
+                                        <span class="badge bg-success rounded-pill px-2 py-1">
+                                            <i class="bi bi-check-circle me-1"></i>Pagado
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark rounded-pill px-2 py-1">
+                                            <i class="bi bi-clock-history me-1"></i>Pendiente
+                                        </span>
+                                    {% endif %}
+
+                                    {% set total = p.deuda_total|default(0, true)|float %}
+                                    {% set saldo = p.saldo_pendiente|default(0, true)|float %}
+                                    {% set pagado = total - saldo %}
+                                    {% set porcentaje_raw = (pagado / total * 100) if total > 0 else 0 %}
+                                    {% set porcentaje = [0, [porcentaje_raw, 100]|min]|max %}
+
+                                    <div class="progress mx-auto mt-1" style="height: 4px; width: 70px;" title="{{ "{:,.2f}".format(porcentaje) }}% Pagado">
+                                        <div class="progress-bar {% if estado_del_pago == 'anulado' %}bg-danger{% elif porcentaje >= 100 %}bg-success{% else %}bg-primary{% endif %}"
+                                             role="progressbar" style="width: {{ porcentaje }}%"></div>
+                                    </div>
+                                    <span class="text-muted fs-7 d-block" style="font-size: 0.7rem;">Restan: ${{ "{:,.2f}".format(saldo) }}</span>
+                                </td>
+
+                                <!-- ACCIONES -->
+                                <td class="pe-3 py-2 text-end">
+                                    <div class="d-flex justify-content-end gap-1">
+                                        <button type="button" class="btn btn-sm btn-outline-success py-1 px-2 fs-7 shadow-sm"
+                                                onclick="abrirComprobante({{ p.cod_pagos }})" title="Ver comprobante">
+                                            <i class="bi bi-file-earmark-pdf me-1"></i>PDF
+                                        </button>
+
+                                        {% if estado_del_pago != 'anulado' %}
+                                            {% if tiene_permiso('Pagos', 'p_eliminar') %}
+                                            <button class="btn btn-sm btn-outline-danger py-1 px-2 fs-7 shadow-sm"
+                                                    onclick="abrirModalAnular('{{ p.cod_pagos }}', '{{ p.placa }}')" title="Anular Pago">
+                                                <i class="bi bi-x-circle me-1"></i>Anular
+                                            </button>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted fs-7 fst-italic align-self-center px-2">Anulado</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+                            <tr id="filaSinResultados" class="d-none">
+                                <td colspan="6" class="text-center py-4">
+                                    <i class="bi bi-inbox fs-2 text-muted d-block mb-2"></i>
+                                    <h6 class="text-muted fw-bold mb-1">No hay pagos encontrados</h6>
+                                    <p class="text-muted small mb-0">No se encontraron registros que coincidan con la búsqueda.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- PIE DE PAGINACIÓN DINÁMICA JS -->
+                <div class="card-footer bg-white border-top-0 d-flex flex-column flex-sm-row justify-content-between align-items-center py-3 px-3 gap-2">
+                    <span class="text-muted small" id="infoPaginacion"></span>
+                    <nav aria-label="Navegación de páginas">
+                        <ul class="pagination pagination-sm mb-0 gap-1" id="contenedorPaginacion"></ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 2: CONTROL DE CUOTAS Y COBRANZA -->
+        <div class="tab-pane fade" id="pane-admin-cuotas" role="tabpanel">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <h6 class="fw-bold mb-0 text-dark">
+                        <i class="bi bi-calendar2-week text-primary me-1"></i>Cuotas Programadas
+                    </h6>
+                    <div class="d-flex align-items-center gap-2">
+                        <select id="filtroEstadoCuotaAdmin" class="form-select form-select-sm" style="width: auto;">
+                            <option value="todas">Todos los estados</option>
+                            <option value="vencida">Vencidas</option>
+                            <option value="pendiente">Pendientes</option>
+                            <option value="parcial">Parciales</option>
+                            <option value="pagada">Pagadas</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover align-middle mb-0 text-nowrap" style="font-size: 0.85rem;">
+                        <thead class="bg-light text-muted small text-uppercase">
+                            <tr>
+                                <th class="ps-3 py-2">Cliente</th>
+                                <th class="py-2">Vehículo</th>
+                                <th class="py-2">Cuota</th>
+                                <th class="py-2">Vencimiento</th>
+                                <th class="py-2 text-end">Monto</th>
+                                <th class="py-2 text-end">Pagado</th>
+                                <th class="py-2 text-end">Saldo</th>
+                                <th class="py-2 text-center">Estado</th>
+                                <th class="pe-3 py-2 text-end">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaCuotasAdminBody">
+                            {% if cuotas is defined and cuotas %}
+                                {% for c in cuotas %}
+                                {% set est_c = (c.estado_actual | default(c.estado) | lower) %}
+                                <tr class="fila-cuota-admin" data-placa="{{ c.placa | upper }}" data-estado="{{ est_c }}">
+                                    <td class="ps-3 py-2">
+                                        <div class="fw-bold text-dark">{{ c.nombre_cliente | default('Cliente') }}</div>
+                                        <span class="text-muted" style="font-size: 0.75rem;">C.I: {{ c.cedula_usuario }}</span>
+                                    </td>
+                                    <td class="py-2">
+                                        <span class="badge bg-secondary bg-opacity-10 text-dark border">{{ c.placa }}</span>
+                                        <div class="text-muted" style="font-size: 0.72rem;">{{ c.frecuencia_pago | default('Mensual') }}</div>
+                                    </td>
+                                    <td class="py-2 fw-bold">#{{ c.numero_cuota }} / {{ c.cantidad_cuotas | default(1) }}</td>
+                                    <td class="py-2">
+                                        {{ c.fecha_vencimiento.strftime('%d/%m/%Y') if c.fecha_vencimiento else 'N/A' }}
+                                        {% if (c.dias_mora | default(0) | int) > 0 and est_c == 'vencida' %}
+                                            <div class="text-danger fw-bold" style="font-size: 0.72rem;">{{ c.dias_mora }} día(s) mora</div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-2 text-end">${{ "{:,.2f}".format(c.monto_cuota | float) }}</td>
+                                    <td class="py-2 text-end text-success">${{ "{:,.2f}".format(c.monto_pagado | float) }}</td>
+                                    <td class="py-2 text-end fw-bold text-danger">${{ "{:,.2f}".format(c.saldo_cuota | default((c.monto_cuota | float) - (c.monto_pagado | float)) | float) }}</td>
+                                    <td class="py-2 text-center">
+                                        {% if est_c == 'pagada' %}
+                                            <span class="badge bg-success rounded-pill">Pagada</span>
+                                        {% elif est_c == 'parcial' %}
+                                            <span class="badge bg-info text-dark rounded-pill">Parcial</span>
+                                        {% elif est_c == 'vencida' %}
+                                            <span class="badge bg-danger rounded-pill">Vencida</span>
+                                        {% elif est_c == 'anulada' %}
+                                            <span class="badge bg-secondary rounded-pill">Anulada</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark rounded-pill">Pendiente</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="pe-3 py-2 text-end">
+                                        {% if est_c in ['pendiente', 'parcial', 'vencida'] %}
+                                            <a href="{{ url_for('pagos.registrar_pago', cod_cuentas=c.cod_cuentas, cod_cuota=c.cod_cuota) }}"
+                                               class="btn btn-sm btn-outline-primary py-1 px-2">
+                                                <i class="bi bi-cash-coin me-1"></i>Cobrar
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted small">—</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="9" class="text-center py-4 text-muted">
+                                        No hay cuotas registradas todavía.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PARA ANULAR PAGO -->
+<div class="modal fade" id="modalAnularPago" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow rounded-3">
+            <form id="formAnularPago" action="{{ url_for('pagos.anular_pago') }}" method="POST">
+                <div class="modal-header bg-danger text-white border-0 py-2">
+                    <h6 class="modal-title fw-bold">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Anular Pago
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body p-3">
+                    <input type="hidden" name="cod_pagos" id="anular_cod_pagos">
+                    
+                    <div class="mb-2">
+                        <label class="form-label text-muted small mb-1">Vehículo / Placa</label>
+                        <input type="text" name="placa" id="anular_placa" class="form-control form-control-sm fw-bold text-uppercase bg-light border-0" readonly>
+                    </div>
+
+                    <div class="alert alert-warning border-0 bg-warning bg-opacity-10 py-2 px-3 fs-7 mb-2 rounded-2">
+                        <i class="bi bi-info-circle me-1"></i>El monto retornará a la deuda y cuotas del cliente.
+                    </div>
+
+                    <div class="mb-1">
+                        <label class="form-label fw-bold small text-muted mb-1">Motivo de Cancelación</label>
+                        <textarea name="motivo" id="motivo_anulacion" class="form-control form-control-sm" rows="2" placeholder="Ej. Error de transferencia..." required maxlength="100"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 bg-light py-2">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-sm btn-danger fw-bold">Confirmar Anulación</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.rutaGenerarFacturaBase = "{{ url_for('pagos.generar_factura_pdf', cod_pagos=0) }}";
+</script>
+<script src="{{ url_for('static', filename='js/pagoadmin.js') }}"></script>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const mensajes = {{ messages | tojson | safe }};
+                mensajes.forEach(([category, message]) => {
+                    Swal.fire({
+                        title: category === 'success' ? '¡Éxito!' : '¡Atención!',
+                        text: message,
+                        icon: ['success', 'error', 'warning', 'info'].includes(category) ? category : 'info',
+                        confirmButtonText: 'Aceptar',
+                        confirmButtonColor: '#0d6efd'
+                    });
+                });
+            });
+        </script>
+    {% endif %}
+{% endwith %}
+
+{% endblock %}

@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-0">Mis Pagos y Cuotas</h2>
+            <p class="text-muted small">Historial de abonos, cronograma de cuotas y saldos pendientes</p>
+        </div>
+
+        <a href="{{ url_for('pagos.registrar_pago') }}"
+           class="btn btn-success shadow-sm px-4 fw-bold rounded-pill">
+            <i class="bi bi-plus-lg me-2"></i>Registrar Pago
+        </a>
+    </div>
+
+    {% if not pagos and not (cuotas is defined and cuotas) %}
+        <div class="alert alert-info shadow-sm border-0 rounded-3 py-4 text-center">
+            <i class="bi bi-info-circle fs-2 d-block mb-2"></i>
+            No se encontraron pagos ni créditos registrados en su historial.
+        </div>
+    {% else %}
+
+        <!-- Pre-procesar resumen de vehículos para las tarjetas -->
+        {% set resumen_vehiculos = {} %}
+        {% set placas_usuario = [] %}
+
+        {% for p in pagos %}
+            {% if p.placa and p.placa not in placas_usuario %}
+                {% set _ = placas_usuario.append(p.placa) %}
+                {% set _ = resumen_vehiculos.update({
+                    p.placa: {
+                        'total': p.deuda_total|default(0, true)|float,
+                        'saldo': p.deuda|default(0, true)|float
+                    }
+                }) %}
+            {% endif %}
+        {% endfor %}
+
+        {% if cuotas is defined and cuotas %}
+            {% for c in cuotas %}
+                {% if c.placa and c.placa not in placas_usuario %}
+                    {% set _ = placas_usuario.append(c.placa) %}
+                    {% set _ = resumen_vehiculos.update({
+                        c.placa: {
+                            'total': c.deuda_total|default(0, true)|float,
+                            'saldo': c.deuda_cuenta|default(0, true)|float
+                        }
+                    }) %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        {% if placas_usuario|length > 0 %}
+        <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
+            <div class="card-body bg-white rounded-3 d-flex align-items-center gap-3">
+                <i class="bi bi-car-front-fill fs-3 text-primary"></i>
+                <div class="flex-grow-1">
+                    <label class="fw-bold small text-muted mb-1">
+                        Seleccionar Vehículo a Crédito:
+                    </label>
+                    <select class="form-select form-select-lg border-0 bg-light fw-bold"
+                            id="selectorVehiculo"
+                            onchange="filtrarPorVehiculo(this.value)">
+                        <option value="todos">Todos mis vehículos</option>
+                        {% for placa in placas_usuario %}
+                            <option value="{{ placa }}">Vehículo - Placa: {{ placa }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- TARJETAS DE RESUMEN -->
+        <div class="row g-3 mb-4 summary-cards">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                    <div class="card-body text-center p-4">
+                        <h6 class="text-muted fw-bold text-uppercase mb-2">Total del Auto</h6>
+                        <h3 class="fw-bold text-dark mb-0" id="card-total-auto">$0.00</h3>
+                        <small class="text-muted">Monto original del crédito</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100" style="border-radius: 15px; background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);">
+                    <div class="card-body text-center p-4">
+                        <h6 class="text-danger fw-bold text-uppercase mb-2">Saldo Pendiente</h6>
+                        <h3 class="fw-bold text-danger mb-0" id="card-saldo-pendiente">$0.00</h3>
+                        <small class="text-danger opacity-75">Lo que resta por pagar</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100 bg-primary text-white" style="border-radius: 15px; background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+                    <div class="card-body text-center p-4">
+                        <h6 class="text-white-50 fw-bold text-uppercase mb-2">Progreso de Pago</h6>
+                        <h3 class="fw-bold mb-0" id="card-progreso-txt">0%</h3>
+                        <div class="progress mt-2 bg-white bg-opacity-25" style="height: 6px;">
+                            <div class="progress-bar bg-white" id="card-progreso-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑAS: HISTORIAL DE PAGOS Y CRONOGRAMA DE CUOTAS -->
+        <ul class="nav nav-pills mb-3 gap-2" id="tabsPagosCliente" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active fw-bold rounded-pill px-4" id="tab-pagos-btn" data-bs-toggle="pill" data-bs-target="#pane-pagos-cliente" type="button" role="tab">
+                    <i class="bi bi-receipt me-1"></i> Historial de Pagos
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-bold rounded-pill px-4" id="tab-cuotas-btn" data-bs-toggle="pill" data-bs-target="#pane-cuotas-cliente" type="button" role="tab">
+                    <i class="bi bi-calendar2-week me-1"></i> Mi Cronograma de Cuotas
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- PESTAÑA 1: HISTORIAL DE PAGOS -->
+            <div class="tab-pane fade show active" id="pane-pagos-cliente" role="tabpanel">
+                <div class="card border-0 shadow-sm mb-5" style="border-radius: 15px; overflow: hidden;">
+                    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0 text-dark">Historial de Transacciones</h5>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="tablaPagos">
+                            <thead class="bg-light text-muted small text-uppercase">
+                                <tr>
+                                    <th class="ps-4 py-3">Fecha</th>
+                                    <th>Placa</th>
+                                    <th>Monto Abonado</th>
+                                    <th>Cuota(s)</th>
+                                    <th>Estado de Cuenta</th>
+                                    <th class="text-end pe-4">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="border-top-0">
+                                {% for p in pagos %}
+                                {% set estado_del_pago = p.estado_pago|default('', true)|string|lower|trim %}
+                                <tr class="fila-pago" data-placa="{{ p.placa }}">
+                                    <td class="ps-4 text-muted fw-medium">
+                                        {{ p.fecha_pago.strftime('%d/%m/%Y') if p.fecha_pago else 'Sin fecha' }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1">
+                                            {{ p.placa }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-dark fs-6">
+                                            ${{ "{:,.2f}".format(p.monto_abonado|default(0, true)|float) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if p.cuotas_aplicadas %}
+                                            <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25">
+                                                {{ p.cuotas_aplicadas }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted small">Abono / Inicial</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if estado_del_pago == 'anulado' %}
+                                            <span class="badge bg-danger rounded-pill px-3 py-2">
+                                                <i class="bi bi-x-circle me-1"></i>Pago Anulado
+                                            </span>
+                                        {% elif p.estado_cuenta|default('', true)|lower == 'pagado' %}
+                                            <span class="badge bg-success rounded-pill px-3 py-2">
+                                                <i class="bi bi-check-circle me-1"></i>Pagado
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
+                                                <i class="bi bi-clock-history me-1"></i>Saldo Pendiente
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group shadow-sm rounded-pill">
+                                            <button class="btn btn-sm btn-light border-end text-primary" title="Ver Detalles"
+                                                    onclick="abrirModalVer(
+                                                        '{{ p.nombre_metodo|default('', true)|e }}',
+                                                        '{{ p.nombre_moneda|default('', true)|e }}',
+                                                        '{{ p.simbolo|default('', true)|e }}',
+                                                        '{{ p.nombre_digital|default('', true)|e }}',
+                                                        '{{ p.simbolo_digital|default('', true)|e }}',
+                                                        '{{ p.referencia|default('', true)|e }}',
+                                                        '{{ p.descripcion|default('', true)|e }}',
+                                                        '{{ p.nombre_banco|default('', true)|e }}',
+                                                        '{{ estado_del_pago }}',
+                                                        '{{ p.cuotas_aplicadas|default('', true)|e }}'
+                                                    )">
+                                                <i class="bi bi-eye-fill"></i> Ver
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-light text-success" title="Ver comprobante PDF"
+                                                    onclick="imprimirRecibo({{ p.cod_pagos }})">
+                                                <i class="bi bi-printer-fill"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card-footer bg-white border-top py-3">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0" id="paginacion-ul"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PESTAÑA 2: CRONOGRAMA DE CUOTAS DEL CLIENTE -->
+            <div class="tab-pane fade" id="pane-cuotas-cliente" role="tabpanel">
+                <div class="card border-0 shadow-sm mb-5" style="border-radius: 15px; overflow: hidden;">
+                    <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0 text-dark">Cronograma de Cuotas</h5>
+                        <span class="text-muted small">Fechas de vencimiento y estado de cada cuota</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="tablaCuotasCliente">
+                            <thead class="bg-light text-muted small text-uppercase">
+                                <tr>
+                                    <th class="ps-4 py-3">Vehículo</th>
+                                    <th>Cuota</th>
+                                    <th>Vencimiento</th>
+                                    <th class="text-end">Monto Cuota</th>
+                                    <th class="text-end">Pagado</th>
+                                    <th class="text-end">Saldo</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-end pe-4">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if cuotas is defined and cuotas %}
+                                    {% for c in cuotas %}
+                                    {% set est_c = (c.estado_actual | default(c.estado) | lower) %}
+                                    <tr class="fila-cuota-cliente" data-placa="{{ c.placa }}">
+                                        <td class="ps-4">
+                                            <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1">{{ c.placa }}</span>
+                                            <div class="text-muted" style="font-size: 0.72rem;">{{ c.frecuencia_pago | default('Mensual') }}</div>
+                                        </td>
+                                        <td class="fw-bold">Cuota #{{ c.numero_cuota }} / {{ c.cantidad_cuotas | default(1) }}</td>
+                                        <td>
+                                            {{ c.fecha_vencimiento.strftime('%d/%m/%Y') if c.fecha_vencimiento else 'N/A' }}
+                                            {% if (c.dias_mora | default(0) | int) > 0 and est_c == 'vencida' %}
+                                                <div class="text-danger fw-bold" style="font-size: 0.72rem;">{{ c.dias_mora }} día(s) de mora</div>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">${{ "{:,.2f}".format(c.monto_cuota | float) }}</td>
+                                        <td class="text-end text-success">${{ "{:,.2f}".format(c.monto_pagado | float) }}</td>
+                                        <td class="text-end fw-bold text-danger">${{ "{:,.2f}".format(c.saldo_cuota | default((c.monto_cuota | float) - (c.monto_pagado | float)) | float) }}</td>
+                                        <td class="text-center">
+                                            {% if est_c == 'pagada' %}
+                                                <span class="badge bg-success rounded-pill px-3">Pagada</span>
+                                            {% elif est_c == 'parcial' %}
+                                                <span class="badge bg-info text-dark rounded-pill px-3">Parcial</span>
+                                            {% elif est_c == 'vencida' %}
+                                                <span class="badge bg-danger rounded-pill px-3">Vencida</span>
+                                            {% elif est_c == 'anulada' %}
+                                                <span class="badge bg-secondary rounded-pill px-3">Anulada</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark rounded-pill px-3">Pendiente</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            {% if est_c in ['pendiente', 'parcial', 'vencida'] %}
+                                                <a href="{{ url_for('pagos.registrar_pago', cod_cuentas=c.cod_cuentas, cod_cuota=c.cod_cuota) }}"
+                                                   class="btn btn-sm btn-outline-success rounded-pill px-3">
+                                                    <i class="bi bi-cash-coin me-1"></i>Pagar
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted small">—</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="8" class="text-center py-4 text-muted">
+                                            No tienes cuotas programadas actualmente.
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- MODAL VER DETALLES -->
+<div class="modal fade" id="modalVerPago" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white border-0">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-receipt-cutoff me-2"></i> Detalles del Pago
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted">Método de Pago:</span>
+                        <strong id="ver_metodo"></strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted">Moneda:</span>
+                        <strong id="ver_moneda"></strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0" id="contenedor_banco" style="display: none !important;">
+                        <span class="text-muted">Banco:</span>
+                        <strong id="ver_banco"><i class="bi bi-bank2 me-1"></i></strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted">N° Referencia / TXID:</span>
+                        <strong id="ver_ref" class="text-break text-end w-50"></strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted">Cuota(s) aplicada(s):</span>
+                        <strong id="ver_cuotas" class="text-end">—</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted">Estado:</span>
+                        <strong id="ver_estado"></strong>
+                    </li>
+                </ul>
+                <div class="mt-3 p-3 bg-light rounded text-center">
+                    <small class="text-muted d-block mb-1">Nota / Descripción del pago</small>
+                    <span id="ver_desc" class="fst-italic"></span>
+                </div>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.pagoClienteConfig = {
+        hayPagos: {% if pagos %}true{% else %}false{% endif %},
+        resumenVehiculos: {% if pagos or (cuotas is defined and cuotas) %}{{ resumen_vehiculos | tojson }}{% else %}{}{% endif %},
+        urlFacturaBase: "{{ url_for('pagos.generar_factura_pdf', cod_pagos=0) }}"
+    };
+</script>
+<script src="{{ url_for('static', filename='js/pagocliente.js') }}"></script>
+
+<style>
+    .table-hover tbody tr { transition: all 0.2s ease; }
+    .table-hover tbody tr:hover { background-color: #f8f9fa; transform: scale(1.005); }
+    .progress { border-radius: 10px; }
+    .badge { font-weight: 600; letter-spacing: 0.3px; }
+    .btn-group .btn { transition: all 0.2s; }
+    .btn-group .btn:hover { background-color: #e9ecef; }
+    
+    @media print {
+        .btn, form, header, footer, .summary-cards, select, .alert, nav { display: none !important; }
+        .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+        body { background-color: white; }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5" id="perfil-main-container"
+    {% if swal %}
+    data-swal-icon="{{ swal.icon }}"
+    data-swal-title="{{ swal.title }}"
+    data-swal-text="{{ swal.text }}"
+    {% endif %}>
+
+    <div class="row g-4">
+
+        <div class="col-lg-4">
+            <div class="card card-profile-sidebar border-0 shadow-sm text-center h-100">
+                <div class="profile-avatar-wrapper py-5 bg-dark position-relative">
+                    <div class="profile-avatar-circle mx-auto bg-primary text-white d-flex align-items-center justify-content-center shadow overflow-hidden" style="width: 120px; height: 120px; border-radius: 50%;">
+                        {% if usuario.foto %}
+                            <img src="{{ url_for('static', filename='uploads/perfiles/' + usuario.foto) }}"
+                                 alt="Foto de {{ usuario.nombre }}"
+                                 class="img-fluid w-100 h-100"
+                                 style="object-fit: cover;">
+                        {% else %}
+                            <i class="bi bi-person-fill display-3"></i>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-body pt-0 px-4 pb-4">
+                    <h4 class="fw-bold text-dark mb-1 mt-3">{{ usuario.nombre }} {{ usuario.apellido }}</h4>
+                    <span class="badge bg-soft-primary text-primary text-uppercase rounded-pill px-3 py-2 fw-semibold mb-3">
+                        {{ usuario.nombre_rol }}
+                    </span>
+
+                    <p class="text-muted small mb-2">
+                        <i class="bi bi-person-vcard me-1"></i> Cédula: {{ usuario.cedula_usuario }}
+                    </p>
+                    <p class="text-muted small mb-2">
+                        <i class="bi bi-envelope me-1"></i> {{ usuario.correo }}
+                    </p>
+                    <p class="text-muted small mb-4">
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ usuario.direccion }}
+                    </p>
+
+                    <hr class="opacity-25">
+
+                    <div class="d-grid gap-2 mt-4">
+                        <a href="/" class="btn btn-outline-secondary rounded-pill btn-sm">
+                            <i class="bi bi-arrow-left me-2"></i> Volver al Inicio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <ul class="nav nav-tabs card-header-tabs custom-profile-tabs border-0" id="profileTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active fw-bold px-4 py-3" id="datos-tab" data-bs-toggle="tab" data-bs-target="#datos-panel" type="button" role="tab">
+                                <i class="bi bi-person-vcard me-2"></i>Datos Personales
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link fw-bold px-4 py-3" id="password-tab" data-bs-toggle="tab" data-bs-target="#password-panel" type="button" role="tab">
+                                <i class="bi bi-shield-lock me-2"></i>Seguridad de Acceso
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="tab-content" id="profileTabsContent">
+
+                        <div class="tab-pane fade show active" id="datos-panel" role="tabpanel">
+                            <h5 class="fw-bold text-dark mb-4 pb-2 border-bottom">
+                                <i class="bi bi-info-circle-fill text-primary me-2"></i>Información Registrada
+                            </h5>
+
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label class="text-secondary small fw-bold text-uppercase tracking-wider">Cédula de Identidad</label>
+                                    <div class="profile-data-box d-flex align-items-center">
+                                        <i class="bi bi-card-text me-3 fs-5 text-muted"></i>
+                                        <span class="fs-6 text-dark fw-medium">{{ usuario.cedula_usuario }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="text-secondary small fw-bold text-uppercase tracking-wider">Correo Electrónico</label>
+                                    <div class="profile-data-box d-flex align-items-center">
+                                        <i class="bi bi-envelope me-3 fs-5 text-muted"></i>
+                                        <span class="fs-6 text-dark fw-medium">{{ usuario.correo }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="text-secondary small fw-bold text-uppercase tracking-wider">Teléfono de Contacto</label>
+                                    <div class="profile-data-box d-flex align-items-center">
+                                        <i class="bi bi-telephone me-3 fs-5 text-muted"></i>
+                                        <span class="fs-6 text-dark fw-medium">{{ usuario.telefono }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="text-secondary small fw-bold text-uppercase tracking-wider">Rol</label>
+                                    <div class="profile-data-box d-flex align-items-center">
+                                        <i class="bi bi-person-badge me-3 fs-5 text-muted"></i>
+                                        <span class="fs-6 text-dark fw-medium">{{ usuario.nombre_rol }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="text-secondary small fw-bold text-uppercase tracking-wider">Dirección Residencial</label>
+                                    <div class="profile-data-box d-flex align-items-center align-items-start">
+                                        <i class="bi bi-geo-alt me-3 fs-5 text-muted mt-1"></i>
+                                        <span class="fs-6 text-dark fw-medium">{{ usuario.direccion }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 d-flex flex-wrap gap-2">
+                                <button class="btn btn-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#modalDatos">
+                                    <i class="bi bi-pencil-square me-2"></i>Editar perfil y foto
+                                </button>
+                                <button class="btn btn-outline-secondary rounded-pill" data-bs-toggle="modal" data-bs-target="#modalPassword">
+                                    <i class="bi bi-shield-lock me-2"></i>Actualizar contraseña
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="password-panel" role="tabpanel">
+                            <div class="row g-4">
+                                <div class="col-md-6 border-end-custom">
+                                    <h5 class="fw-bold text-dark mb-3">
+                                        <i class="bi bi-key-fill text-warning me-2"></i>Actualizar Contraseña
+                                    </h5>
+
+                                    <form action="{{ url_for('user.cambiar_password_perfil') }}" method="POST" class="needs-validation" novalidate>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Contraseña Actual</label>
+                                            <input type="password" name="password_actual" class="form-control form-control-custom" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Nueva Contraseña</label>
+                                            <input type="password" name="nueva_password" class="form-control form-control-custom" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Confirmar Nueva Contraseña</label>
+                                            <input type="password" name="confirmar_password" class="form-control form-control-custom" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-warning btn-sm w-100 rounded-pill fw-bold text-dark">
+                                            Actualizar Clave
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <h5 class="fw-bold text-dark mb-3">
+                                        <i class="bi bi-shield-check text-success me-2"></i>Preguntas de Seguridad
+                                    </h5>
+                                    <p class="text-muted small mb-3">Puedes registrarlas por primera vez o actualizarlas validando tus respuestas viejas.</p>
+
+                                    <form action="{{ url_for('user.guardar_preguntas') }}" method="POST">
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Pregunta de Seguridad #1</label>
+                                            <select name="pregunta_1" class="form-select form-control-custom" required>
+                                                <option value="" disabled selected>Selecciona una opción...</option>
+                                                {% for pregunta in preguntas %}
+                                                <option value="{{ pregunta.cod_preguntas }}">{{ pregunta.nombre_preguntas }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <input type="text" name="respuesta_1" class="form-control form-control-custom mt-2" placeholder="Tu respuesta..." required>
+                                            <input type="text" name="confirmar_respuesta_1" class="form-control form-control-custom mt-2" placeholder="Confirmar respuesta..." required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Pregunta de Seguridad #2</label>
+                                            <select name="pregunta_2" class="form-select form-control-custom" required>
+                                                <option value="" disabled selected>Selecciona una opción...</option>
+                                                {% for pregunta in preguntas %}
+                                                <option value="{{ pregunta.cod_preguntas }}">{{ pregunta.nombre_preguntas }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <input type="text" name="respuesta_2" class="form-control form-control-custom mt-2" placeholder="Tu respuesta..." required>
+                                            <input type="text" name="confirmar_respuesta_2" class="form-control form-control-custom mt-2" placeholder="Confirmar respuesta..." required>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-success btn-sm w-100 rounded-pill fw-bold">
+                                            Guardar Preguntas
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <div class="row g-4">
+                                <div class="col-12">
+                                    <h5 class="fw-bold text-dark mb-3">
+                                        <i class="bi bi-arrow-repeat text-info me-2"></i>Actualizar Preguntas de Seguridad
+                                    </h5>
+                                    <p class="text-muted small mb-3">Para cambiar tus preguntas, primero valida tus respuestas anteriores.</p>
+
+                                    <form action="{{ url_for('user.actualizar_preguntas') }}" method="POST">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label small fw-bold">Respuesta anterior #1</label>
+                                                <input type="text" name="respuesta_vieja_1" class="form-control form-control-custom" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small fw-bold">Respuesta anterior #2</label>
+                                                <input type="text" name="respuesta_vieja_2" class="form-control form-control-custom" required>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label small fw-bold">Nueva pregunta #1</label>
+                                                <select name="pregunta_nueva_1" class="form-select form-control-custom" required>
+                                                    <option value="" disabled selected>Selecciona una opción...</option>
+                                                    {% for pregunta in preguntas %}
+                                                    <option value="{{ pregunta.cod_preguntas }}">{{ pregunta.nombre_preguntas }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                <input type="text" name="respuesta_nueva_1" class="form-control form-control-custom mt-2" placeholder="Nueva respuesta..." required>
+                                                <input type="text" name="confirmar_respuesta_nueva_1" class="form-control form-control-custom mt-2" placeholder="Confirmar nueva respuesta..." required>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label small fw-bold">Nueva pregunta #2</label>
+                                                <select name="pregunta_nueva_2" class="form-select form-control-custom" required>
+                                                    <option value="" disabled selected>Selecciona una opción...</option>
+                                                    {% for pregunta in preguntas %}
+                                                    <option value="{{ pregunta.cod_preguntas }}">{{ pregunta.nombre_preguntas }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                                <input type="text" name="respuesta_nueva_2" class="form-control form-control-custom mt-2" placeholder="Nueva respuesta..." required>
+                                                <input type="text" name="confirmar_respuesta_nueva_2" class="form-control form-control-custom mt-2" placeholder="Confirmar nueva respuesta..." required>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-4">
+                                            <button type="submit" class="btn btn-info text-white rounded-pill fw-bold">
+                                                Actualizar Preguntas
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal fade" id="modalDatos" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form action="{{ url_for('user.actualizar_datos_perfil') }}" method="POST" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Datos Personales y Foto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Correo Electrónico</label>
+                        <input type="email" name="correo" class="form-control" value="{{ usuario.correo }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Teléfono</label>
+                        <input type="text" name="telefono" class="form-control" value="{{ usuario.telefono }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Dirección</label>
+                        <textarea name="direccion" class="form-control" rows="3" required>{{ usuario.direccion }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Foto de Perfil (Opcional, máx. 2MB - JPG, JPEG, PNG)</label>
+                        <input type="file" name="foto_perfil" class="form-control" accept=".jpg, .jpeg, .png">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary rounded-pill">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalPassword" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form action="{{ url_for('user.cambiar_password_perfil') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cambiar Contraseña</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Contraseña actual</label>
+                        <input type="password" name="password_actual" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Nueva contraseña</label>
+                        <input type="password" name="nueva_password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Confirmar contraseña</label>
+                        <input type="password" name="confirmar_password" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning rounded-pill fw-bold text-dark">Actualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/perfil.js') }}"></script>
+{% endblock %}

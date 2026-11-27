@@ -1,0 +1,5 @@
+ Bitacora.registrar(usuario['cedula_usuario'], cod_accion=7, cod_modulo=1)  # Registro de intento fallido
+
+from models.bitacora import Bitacora
+
+PARA REGISTRAR EN BITACORA

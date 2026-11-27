@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+
+<div class="container mt-4">
+
+    <div class="container-fluid mt-4 mb-5 px-0">
+        <div class="card shadow border-0" style="border-radius: 10px;">
+            <div class="card-header bg-dark text-white p-3" style="border-radius: 10px 10px 0 0;">
+                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Historial de Movimientos</h5>
+            </div>
+
+            <div class="card-body p-3">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 nowrap" id="tablaHistorial" style="width:100%;">
+                        <thead class="table-light text-secondary">
+                            <tr>
+                                <th class="ps-4">Fecha y Hora</th>
+                                <th>Placa</th>
+                                <th>Vehículo</th>
+                                <th>Estado Asignado</th>
+                                <th>Observaciones del Movimiento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for h in logs %}
+                            <tr>
+                                <td class="ps-4" data-order="{{ h.fecha_cambio.strftime('%Y%m%d%H%M%S') }}">
+                                    <div class="fw-bold">{{ h.fecha_cambio.strftime('%d/%m/%Y') }}</div>
+                                    <small class="text-muted">{{ h.fecha_cambio.strftime('%H:%M %p') }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-dark px-3 mb-1">{{ h.placa }}</span>
+                                </td>
+                                <td>
+                                    <div class="fw-bold small">{{ h.nombre_marca }}</div>
+                                    <small class="text-muted">{{ h.nombre_modelo }} ({{ h.color }})</small>
+                                </td>
+                                <td>
+                                    <span class="badge 
+                                        {% if h.estado == 'Disponible' %}bg-success
+                                        {% elif h.estado == 'Mantenimiento' %}bg-warning text-dark
+                                        {% elif h.estado == 'Vendido' %}bg-danger
+                                        {% else %}bg-info{% endif %} px-3">
+                                        {{ h.estado }}
+                                    </span>
+                                </td>
+                                <td class="text-wrap" style="max-width: 300px;">
+                                    <p class="mb-0 text-muted small">{{ h.observaciones }}</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+<script src="{{ url_for('static', filename='js/registro_vehiculo.js') }}?v={{ range(1, 1000) | random }}"></script>
+
+{% endblock %}

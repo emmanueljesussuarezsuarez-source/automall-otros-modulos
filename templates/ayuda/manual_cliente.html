@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-lg border-0 p-4 p-md-5 rounded-4 bg-white">
+        
+        <!-- Encabezado del Manual -->
+        <div class="border-bottom pb-4 mb-5">
+            <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-person-circle text-primary display-4 me-3"></i>
+                <div>
+                    <h1 class="fw-bold text-dark mb-1">Guía y Manual de Operación para Clientes</h1>
+                    <p class="text-muted mb-0">Sistema Integral de Gestión Automotriz — AutoMall (Manual Paso a Paso)</p>
+                </div>
+            </div>
+            <div class="alert alert-light border border-primary border-opacity-25 bg-light text-dark rounded-3 shadow-sm">
+                <i class="bi bi-star-fill text-primary me-2"></i>
+                <strong>¡Bienvenido a AutoMall!</strong> Este manual le guiará de manera sencilla a través de todas las herramientas digitales disponibles para explorar nuestro catálogo de vehículos, programar citas de visita y prueba de manejo, y revisar el estado de sus pagos o compras.
+            </div>
+        </div>
+
+        <!-- CAPÍTULO 1: INTRODUCCIÓN Y ACCESO AL SISTEMA -->
+        <section class="mb-5">
+            <h2 class="h4 fw-bold text-primary mb-3"><i class="bi bi-info-circle me-2"></i>Capítulo 1: Introducción y Guía de Uso General</h2>
+            <p class="text-secondary">
+                Como cliente registrado en la agencia AutoMall, usted cuenta con un espacio personal seguro para gestionar su proceso de compra vehicular. Tenga en cuenta las siguientes recomendaciones generales de navegación:
+            </p>
+            <ul class="text-secondary">
+                <li><strong>Inicio de Sesión:</strong> Ingrese su número de cédula o correo electrónico registrado y su contraseña secreta en la pantalla principal de acceso para entrar a su cuenta personal.</li>
+                <li><strong>Botones Interactivos:</strong> Son rectángulos de colores que ejecutan acciones inmediatas al hacer clic sobre ellos con el ratón (como reservar una cita, confirmar un pago o actualizar sus datos).</li>
+                <li><strong>Protocolo de Seguridad:</strong> Al terminar de realizar sus gestiones en la plataforma, haga clic en su nombre ubicado en la esquina superior derecha de la pantalla y seleccione la opción <strong>Cerrar Sesión</strong> para proteger su información personal.</li>
+            </ul>
+        </section>
+
+        <!-- CAPÍTULO 2: MI PERFIL Y DATOS PERSONALES -->
+        <section class="mb-5">
+            <h2 class="h4 fw-bold text-primary mb-3"><i class="bi bi-person-badge me-2"></i>Capítulo 2: Gestión de Mi Perfil</h2>
+            <p class="text-secondary">El módulo de perfil le permite mantener actualizada su información personal para que los asesores comerciales de la agencia puedan comunicarse con usted.</p>
+            <div class="p-4 border rounded-3 bg-light">
+                <h6 class="fw-bold text-dark">¿Qué funciones tiene disponibles en su perfil?</h6>
+                <ul class="text-secondary small ps-3 mb-0">
+                    <li><strong>Actualización de Datos:</strong> Modificar su número de teléfono, dirección de domicilio y correo electrónico de contacto.</li>
+                    <li><strong>Fotografía de Avatar:</strong> Hacer clic en el botón de examinar archivos para seleccionar una imagen desde su computadora y personalizar su foto de perfil en el sistema.</li>
+                    <li><strong>Seguridad de Clave:</strong> Ingresar su contraseña actual y registrar una nueva clave de acceso segura para proteger su cuenta de comprador.</li>
+                      <li><strong>Actualización de Datos:</strong> Modificar su número de teléfono, dirección de domicilio y correo electrónico de contacto.</li>
+                    <li><strong>Registrar pregunstas de seguridad:</strong> podra registrar sus preguntas de seguridad para una posterior de contraseña  por llegado caso de olvidarla </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- CAPÍTULO 3: CATÁLOGO COMERCIAL DE VEHÍCULOS -->
+        <section class="mb-5">
+            <h2 class="h4 fw-bold text-primary mb-3"><i class="bi bi-search me-2"></i>Capítulo 3: Catálogo Comercial de Vehículos</h2>
+            <p class="text-secondary">Antes de concretar una cita o compra, esta sección le permite explorar la oferta disponible en el concesionario.</p>
+            <div class="p-4 border rounded-3 bg-light">
+                <h5 class="fw-bold text-dark"><i class="bi bi-car-front text-primary me-2"></i>Exploración de Inventario</h5>
+                <p class="text-secondary small mb-0">Interfaz visual interactiva donde puede observar la galería fotográfica completa, el año, el kilometraje, las especificaciones técnicas y los precios actualizados de todos los vehículos nuevos o usados que se encuentran en exhibición para la venta en AutoMall.</p>
+            </div>
+        </section>
+
+        <!-- CAPÍTULO 4: MÓDULO DETALLADO DE CITAS Y RESERVAS (COMPRA Y VISITAS) -->
+        <section class="mb-5">
+            <h2 class="h4 fw-bold text-primary mb-3"><i class="bi bi-calendar-event me-2"></i>Capítulo 4: Módulo  de Citas </h2>
+            <p class="text-secondary">Este es el módulo más importante para iniciar su proceso de adquisición. Le permite programar una visita presencial a la agencia AutoMall para evaluar un vehículo de su interés, realizar una prueba de manejo o reunirse con un asesor de ventas para formalizar la compra.</p>
+            
+            <div class="p-4 border rounded-3 bg-light mb-4">
+                <h4 class="fw-bold text-dark"><i class="bi bi-plus-circle text-primary me-2"></i>¿Cómo solicitar una cita comercial paso a paso?</h4>
+                <ol class="text-secondary small ps-3 mb-3">
+                    <li>Haga clic en la opción de <strong>Citas</strong> ubicada en el menú de navegación superior de la pantalla.</li>
+                    <li>Presione el botón principal titulado <span class="badge bg-primary">Agendar nueva cita Cita</span>  para desplegar el formulario de agendamiento.</li>
+                    <li><strong>Selección de Vehículo de Interés:</strong> Despliegue la lista de opciones y elija el automóvil del catálogo que desea venir a ver, probar o comprar en la agencia.</li>
+                    <li><strong>Fecha y Hora:</strong> Utilice el selector de calendario para elegir el día disponible dentro de la jornada de atención al público del concesionario, y seleccione la hora exacta de su preferencia.</li>
+                    <li><strong>Botón Final <span class="badge bg-success">Agendar cita</span>:</strong> Al hacer clic aquí, la cita se registra oficialmente en el sistema del concesionario y se notifica al departamento comercial.</li>
+                </ol>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="p-4 border rounded-3 bg-light h-100">
+                        <h5 class="fw-bold text-dark"><i class="bi bi-list-check text-primary me-2"></i>Consulta del Historial de Citas</h5>
+                        <p class="text-secondary small mb-0">En la pantalla principal de citas verá una tabla resumen con todas las visitas que ha programado. Podrá visualizar la fecha acordada, el vehículo seleccionado y el estatus en el que se encuentra su solicitud (Pendiente de confirmación por la agencia, Aprobada o Completada).</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-4 border rounded-3 bg-light h-100">
+                        <h5 class="fw-bold text-dark"><i class="bi bi-x-circle text-danger me-2"></i>Modificación o Cancelación de Citas</h5>
+                        <p class="text-secondary small mb-0">Si por algún motivo imprevisto no puede asistir a su cita programada en la fecha prevista, podrá ubicar su reserva en la tabla y hacer clic en el botón <span class="badge bg-danger">Cancelar Cita</span> (disponible mientras la solicitud esté pendiente), liberando el espacio en el sistema de forma inmediata.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CAPÍTULO 5: GESTIÓN DE PAGOS Y ABONOS -->
+        <section class="mb-5">
+            <h2 class="h4 fw-bold text-primary mb-3"><i class="bi bi-credit-card me-2"></i>Capítulo 5: Consulta y Gestión de Pagos</h2>
+            <p class="text-secondary">Le permite llevar un control transparente del estado de cuenta de sus transacciones, iniciales o abonos realizados para la compra de su vehículo.</p>
+            <div class="p-4 border rounded-3 bg-light">
+                <ul class="text-secondary small ps-3 mb-0">
+                    <li><strong>Historial de Pagos Personales:</strong> Muestra una tabla detallada con las referencias bancarias de sus transferencias, los montos cancelados (calculados automáticamente según la tasa oficial vigente del BCV) y el estatus de aprobación por parte del departamento de administración de la agencia.</li>
+                    <li><strong>Comprobantes Digitales:</strong> Permite visualizar y descargar los recibos electrónicos correspondientes a cada cuota o pago exitoso registrado en su cuenta de cliente.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Pie de página oficial -->
+        <div class="text-center mt-5 pt-4 border-top">
+            <p class="text-muted small mb-0">&copy; 2026 AutoMall - Guía Oficial de Usuario para Clientes de la Agencia de Vehículos.</p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

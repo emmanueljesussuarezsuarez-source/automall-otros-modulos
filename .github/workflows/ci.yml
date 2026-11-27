@@ -1,0 +1,78 @@
+name: CI AutoMall - Pruebas de Otros Modulos
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  pruebas-otros-modulos:
+    runs-on: ubuntu-latest
+
+    services:
+      mariadb:
+        image: mariadb:10.4
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      FLASK_ENV: "testing"
+      DB_HOST: "127.0.0.1"
+      DB_USER: "root"
+      DB_PASSWORD: ""
+      DB_NEGOCIO_NAME: "automall_test"
+      DB_SEGURIDAD_NAME: "seguridad_test"
+
+    steps:
+      - name: Descargar codigo del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar cliente MySQL y dependencias de Python
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mariadb-client
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest-playwright
+
+      - name: Instalar navegador Chromium para Playwright
+        run: python -m playwright install --with-deps chromium
+
+      - name: Cargar bases de datos de prueba (automall_test y seguridad_test)
+        run: |
+          mysql --skip-ssl -h 127.0.0.1 -u root -e "CREATE DATABASE IF NOT EXISTS seguridad_test; CREATE DATABASE IF NOT EXISTS automall_test;"
+          mysql --skip-ssl -h 127.0.0.1 -u root seguridad_test < seguridad.sql
+          sed -e 's/`seguridad`\./`seguridad_test`./g' -e 's/`automall`\./`automall_test`./g' -e 's/\bautomall\./automall_test./g' automall.sql | mysql --skip-ssl -h 127.0.0.1 -u root automall_test
+
+      - name: Ejecutar pruebas de los demas modulos (sin Taller, Servicios ni Mantenimiento) y generar JUnit XML
+        run: |
+          python -m pytest tests/unit tests/backend tests/integration tests/smoke tests/interfaz tests/aceptacion \
+            --ignore=tests/unit/test_taller.py \
+            --ignore=tests/unit/test_servicios.py \
+            --ignore=tests/unit/test_mantenimiento_operacional.py \
+            --ignore=tests/integration/test_taller_integration.py \
+            --ignore=tests/integration/test_servicios_integration.py \
+            --ignore=tests/integration/test_mantenimiento_operacional_integration.py \
+            --ignore=tests/interfaz/test_taller_ui.py \
+            --ignore=tests/interfaz/test_servicios_ui.py \
+            --ignore=tests/interfaz/test_mantenimiento_operacional_ui.py \
+            -v --junitxml=resultado.xml
+
+      - name: Subir resultado.xml como Artifact descargable
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-xml-automall-otros-modulos
+          path: resultado.xml

@@ -1,0 +1,77 @@
+<!-- Contenedor del Overlay y Tooltip para Visita Guiada Interactiva -->
+<div id="tourOverlayContainer" class="tour-overlay-wrapper" aria-hidden="true" style="display: none;">
+    <!-- Máscara de oscurecimiento y foco luminoso (Spotlight) -->
+    <div id="tourSpotlight" class="tour-spotlight" tabindex="-1"></div>
+
+    <!-- Tooltip flotante interactivo y accesible -->
+    <div id="tourTooltip" 
+         class="tour-tooltip" 
+         role="dialog" 
+         aria-modal="true" 
+         aria-labelledby="tourTooltipTitle" 
+         aria-describedby="tourTooltipContent"
+         tabindex="-1">
+        
+        <!-- Flecha direccional del tooltip -->
+        <div id="tourTooltipArrow" class="tour-tooltip-arrow"></div>
+
+        <!-- Encabezado del Tooltip -->
+        <div class="tour-tooltip-header">
+            <div class="d-flex align-items-center gap-2">
+                <span id="tourModuleBadge" class="tour-module-badge">
+                    <i class="bi bi-compass"></i> Guía
+                </span>
+                <span id="tourStepBadge" class="tour-step-badge">Paso 1 de 1</span>
+            </div>
+            <button type="button" 
+                    id="btnTourClose" 
+                    class="tour-btn-close" 
+                    aria-label="Cerrar visita guiada" 
+                    title="Cerrar visita guiada (Esc)">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <!-- Barra de progreso visual -->
+        <div class="tour-progress-bar-container" aria-hidden="true">
+            <div id="tourProgressBar" class="tour-progress-bar" style="width: 0%;"></div>
+        </div>
+
+        <!-- Cuerpo del Tooltip -->
+        <div class="tour-tooltip-body">
+            <h6 id="tourTooltipTitle" class="tour-tooltip-title">Título del paso</h6>
+            <p id="tourTooltipContent" class="tour-tooltip-content">Descripción del paso explicada para el usuario.</p>
+        </div>
+
+        <!-- Pie con Controles de Navegación -->
+        <div class="tour-tooltip-footer">
+            <div class="tour-footer-left">
+                <button type="button" id="btnTourSkip" class="tour-btn-subtle" title="Omitir la visita guiada">
+                    Omitir
+                </button>
+                <button type="button" id="btnTourRestart" class="tour-btn-subtle" title="Reiniciar desde el inicio" style="display: none;">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reiniciar
+                </button>
+            </div>
+            <div class="tour-footer-right">
+                <button type="button" id="btnTourPrev" class="tour-btn-secondary" title="Paso anterior (Flecha Izquierda)" disabled>
+                    <i class="bi bi-chevron-left"></i> Anterior
+                </button>
+                <button type="button" id="btnTourNext" class="tour-btn-primary" title="Siguiente paso (Flecha Derecha o Enter)">
+                    Siguiente <i class="bi bi-chevron-right"></i>
+                </button>
+                <button type="button" id="btnTourFinish" class="tour-btn-success" title="Completar la visita" style="display: none;">
+                    Finalizar <i class="bi bi-check2-circle"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Atajos de teclado informativos -->
+        <div class="tour-keyboard-hints" aria-hidden="true">
+            <span><kbd>Esc</kbd> Salir</span>
+            <span><kbd>&larr;</kbd> Anterior</span>
+            <span><kbd>&rarr;</kbd> Siguiente</span>
+        </div>
+    </div>
+</div>
+

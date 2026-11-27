@@ -1,0 +1,18 @@
+# Variables de entorno y credenciales privadas
+.env
+*.log
+
+# Binarios locales
+ngrok.exe
+
+# Archivos temporales de Python, cobertura y pytest
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+resultado.xml
+
+# Datos en tiempo de ejecucion y reportes locales
+data/notificaciones.json
+tests/rendimiento/reportes/

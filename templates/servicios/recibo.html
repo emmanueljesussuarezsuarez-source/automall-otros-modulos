@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recibo de Servicio #{{ servicio.cod_servicios }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/recibo.css') }}">
+</head>
+<body>
+    <button class="btn-imprimir" onclick="window.print()">Imprimir Recibo</button>
+
+    <div class="factura">
+        <div class="encabezado">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='img/automall.jpeg') }}" alt="Automall del Centro C.A.">
+                <p>Dirección: carrera 18 con esquina/calle 22, estado Lara, centro de Barquisimeto, municipio Iribarren parroquia Catedral</p>
+            </div>
+            <div class="info-factura">
+                <h2>RECIBO DE SERVICIO</h2>
+                <p><strong>N° {{ servicio.cod_servicios }}</strong></p>
+                <p><strong>Fecha:</strong> {{ servicio.fecha_realizacion or 'No especificada' }}</p>
+            </div>
+        </div>
+
+        <div class="datos-vehiculo">
+            <h3>INFORMACIÓN DEL SERVICIO</h3>
+            <div class="fila">
+                <label>Nombre del Servicio:</label>
+                <span>{{ servicio.nombre_servicio }}</span>
+            </div>
+            <div class="fila">
+                <label>Vehículo (Placa):</label>
+                <span>{{ servicio.placa or 'No asignado' }}</span>
+            </div>
+            <div class="fila">
+                <label>Estado:</label>
+                <span>{{ servicio.estado }}</span>
+            </div>
+            <div class="fila">
+                <label>Descripción Específica:</label>
+                <span>{{ servicio.descripcion_especifica or 'Sin descripción' }}</span>
+            </div>
+        </div>
+
+        <div class="totales">
+            <div class="fila-total">
+                <label>Costo Base:</label>
+                <span>${{ "%.2f"|format(servicio.costo_base) if servicio.costo_base is not none else '0.00' }}</span>
+            </div>
+            <div class="fila-total final">
+                <label>COSTO FINAL:</label>
+                <span>${{ "%.2f"|format(servicio.costo_final) if servicio.costo_final is not none else '0.00' }}</span>
+            </div>
+        </div>
+
+        <div class="pie">
+            <p>Esto solo es un comprobante interno de la agencia AUTOMALL DEL CENTRO C.A.</p>
+        </div>
+    </div>
+</body>
+</html>

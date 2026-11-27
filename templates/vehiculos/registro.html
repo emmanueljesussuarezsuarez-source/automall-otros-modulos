@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-xl-11">
+            <div class="card shadow border-0" style="border-radius: 15px;">
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <div class="col-12 bg-primary text-white p-4 text-center" style="border-radius: 15px 15px 0 0;">
+                            <h2 class="fw-bold mb-0"><i class="bi bi-car-front-fill me-2"></i>Registro del Vehículo</h2>
+                            <p class="mb-0 opacity-75">Complete la documentación y los datos técnicos del vehículo</p>
+                        </div>
+                    <div class="col-12 p-4 p-md-5">
+                        <form action="{{ url_for('vehiculos.registro') }}" method="POST" enctype="multipart/form-data">
+                            <div class="row g-5">
+                                
+                                <!-- COLUMNA IZQUIERDA: DOCUMENTACIÓN Y ACCESORIOS  -->
+                                <div class="col-lg-4 border-end">
+                                    <h4 class="mb-4 text-primary"><i class="bi bi-file-earmark-check me-2"></i>Documentación</h4>
+                                    <hr>
+                                    <div class="row gy-3">
+                                        <div class="col-12 mt-2">
+                                            <label class="form-label fw-bold">Fecha de Ingreso</label>
+                                            <input type="date" name="fecha_ingreso" class="form-control" required>
+                                        </div>
+
+                                        {% set docs = [
+                                            ('original_totalPropiedad', 'Título de Propiedad'),
+                                            ('experticia_transito', 'Experticia de Tránsito'),
+                                            ('certificado_origen', 'Certificado de Origen'),
+                                            ('carnet_circulacion', 'Carnet de Circulación'),
+                                            ('reserva_dominio', 'Reserva de Dominio'),
+                                            ('garantia_vehiculo', 'Garantía del Vehículo'),
+                                            ('certificado_garantia', 'Certificado de Garantía'),
+                                            ('manual_vehiculoGarantia', 'Manual del Vehículo'),
+                                            ('finiquito', 'Finiquito'),
+                                            ('resguardo', 'Resguardo'),
+                                            ('seguro', 'Seguro / Póliza'),
+                                            ('factura_compra', 'Factura de Compra')
+                                        ] %}
+
+                                        {% for field, label in docs %}
+                                        <div class="col-12">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" name="{{ field }}" id="{{ field }}">
+                                                <label class="form-check-label fw-semibold" for="{{ field }}">{{ label }}</label>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <!-- SECCIÓN DE ACCESORIOS  -->
+                                    <h4 class="mt-5 mb-3 text-primary"><i class="bi bi-tools me-2"></i>Accesorios</h4>
+                                    <hr>
+                                    <div class="row gy-2">
+                                        <div class="col-12">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" name="copia_llaves" id="copia_llaves">
+                                                <label class="form-check-label fw-semibold" for="copia_llaves">Copia de Llaves</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" name="repuesto" id="repuesto">
+                                                <label class="form-check-label fw-semibold" for="repuesto">Caucho de Repuesto</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" name="triangulo" id="triangulo">
+                                                <label class="form-check-label fw-semibold" for="triangulo">Triángulo de Seguridad</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 mt-3">
+                                            <label class="form-label fw-bold">Observaciones Extra</label>
+                                            <textarea name="otro_documento" class="form-control" rows="3" placeholder="Detalles adicionales..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- COLUMNA DERECHA: DATOS DEL VEHÍCULO -->
+                                <div class="col-lg-8">
+                                    <h4 class="mb-4 text-primary"><i class="bi bi-info-circle me-2"></i>Detalles Técnicos</h4>
+                                    <hr>
+                                    <div class="row g-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Placa</label>
+                                            <input type="text" name="placa" class="form-control form-control-lg" placeholder="ABC-123" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Color</label>
+                                            <input type="text" name="color" class="form-control form-control-lg" placeholder="Ej: Blanco" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Año del Modelo</label>
+                                            <input type="number" name="anio" class="form-control form-control-lg" placeholder="2024" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Kilometraje</label>
+                                            <input type="number" name="kilometraje" class="form-control form-control-lg" placeholder="Ej: 50000" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Tipo de Vehículo</label>
+                                            <select name="tipo" class="form-select form-control-lg" required>
+                                                <option value="" selected disabled>Seleccione un Tipo...</option>
+                                                {% for t in tipos %}
+                                                    <option value="{{ t.cod_tipo }}">{{ t.nombre_tipo }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- SELECTOR DE MODELO CON NOMBRE DE MARCA AL LADO -->
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Modelo</label>
+                                            <select name="modelo" id="select-modelo" class="form-select form-control-lg" onchange="seleccionarMarca(this)" required>
+                                                <option value="" selected disabled>Seleccione un modelo...</option>
+                                                {% for modelo in modelos %}
+                                                <option value="{{ modelo.cod_modelo }}" data-marca="{{ modelo.cod_marca }}">
+                                                    {{ modelo.nombre_modelo }} ({{ modelo.nombre_marca }})
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                            <div class="mt-2">
+                                                <a href="javascript:void(0)" class="text-decoration-none text-primary fw-semibold" data-bs-toggle="modal" data-bs-target="#modalCrearModelo">
+                                                    <i class="bi bi-plus-circle me-1"></i>Crear nuevo modelo
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                        <!-- SELECTOR DE MARCA ASIGNADA -->
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Marca Asignada</label>
+                                            <select id="select-marca" class="form-select form-control-lg bg-light" style="pointer-events: none;" tabindex="-1">
+                                                <option value="" selected disabled>---</option>
+                                                {% for marca in marcas %}
+                                                <option value="{{ marca.cod_marca }}">{{ marca.nombre_marca }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <div class="mt-2">
+                                                <a href="javascript:void(0)" class="text-decoration-none text-primary fw-semibold" data-bs-toggle="modal" data-bs-target="#modalCrearMarca">
+                                                    <i class="bi bi-plus-circle me-1"></i>Crear nueva marca
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Estado Inicial</label>
+                                            <select name="estado" class="form-select form-control-lg" required>
+                                                <option value="Disponible">Disponible</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- SELECCIONAR / CREAR PROPIETARIO -->
+                                        <div class="col-md-12">
+                                            <label class="form-label fw-bold">Propietario (Dueño Anterior) *</label>
+                                            <select name="cedula" id="select-propietario" class="form-select form-control-lg" required>
+                                                <option value="" selected disabled>-- Seleccionar propietario --</option>
+                                                {% for prov in propietarios %}
+                                                <option value="{{ prov.cedula_propietario }}">{{ prov.razon_social }} (CI: {{ prov.cedula_propietario }})</option>
+                                                {% endfor %}
+                                            </select>
+                                            <div class="mt-2">
+                                                <a href="javascript:void(0)" class="text-decoration-none text-primary fw-semibold" data-bs-toggle="modal" data-bs-target="#modalCrearPropietario">
+                                                    <i class="bi bi-plus-circle me-1"></i>Crear nuevo propietario
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <label class="form-label fw-bold">Fotografías del Vehículo</label>
+                                            <input type="file" name="imagenes" id="input-imagenes" class="form-control" accept="image/*" multiple onchange="previsualizarFotos(this)" required>
+                                            <small class="text-muted d-block mt-1">Puedes seleccionar varias fotos a la vez manteniendo presionado Ctrl o Shift.</small>
+
+                                            <div id="preview-imagenes" class="d-flex flex-wrap gap-2 mt-3 p-2 bg-light rounded border" style="min-height: 80px;">
+                                                <span class="text-muted small my-auto ps-2" id="texto-sin-fotos">No hay fotografías seleccionadas aún.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <h4 class="mt-5 mb-4 text-success"><i class="bi bi-shop me-2"></i>Información de Venta (Catálogo)</h4>
+                                    <hr>
+                                    <div class="row g-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Precio de Venta ($)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-success text-white">$</span>
+                                                <input type="number" step="0.01" name="precio" class="form-control form-control-lg" placeholder="0.00" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <label class="form-label fw-bold">Descripción para Catálogo</label>
+                                            <textarea name="descripcion_catalogo" class="form-control" rows="3" placeholder="Escriba los detalles que verá el cliente..." required></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mt-5">
+                                        <div class="col-md-8">
+                                            <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
+                                                <i class="bi bi-check-circle me-2"></i>Finalizar Registro
+                                            </button>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <a href="{{ url_for('vehiculos.lista') }}" class="btn btn-outline-secondary btn-lg w-100">Cancelar</a>
+                                        </div>
+                                    </div>
+                                </div> 
+                            </div> 
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL: REGISTRAR NUEVO MODELO RÁPIDO                                      -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="modalCrearModelo" tabindex="-1" aria-labelledby="modalCrearModeloLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalCrearModeloLabel">
+                    <i class="bi bi-car-front me-2"></i>Nuevo Modelo
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formNuevoModeloModal" action="{{ url_for('modelos.registro_modelo') }}" method="POST">
+                <input type="hidden" name="estado" value="Activo">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Marca *</label>
+                        <select name="cod_marca" id="modal_modelo_cod_marca" class="form-select" required>
+                            <option value="" disabled selected>Seleccione una marca...</option>
+                            {% for marca in marcas %}
+                                <option value="{{ marca.cod_marca }}">{{ marca.nombre_marca }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nombre del Modelo *</label>
+                        <input type="text" name="nombre_modelo" id="modal_modelo_nombre" class="form-control" placeholder="Ej: Corolla, Spark, F-150..." maxlength="21" required>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success fw-bold px-4" id="btnGuardarModeloModal">
+                        <i class="bi bi-save me-1"></i>Guardar Modelo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL: REGISTRAR NUEVA MARCA RÁPIDA                                       -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="modalCrearMarca" tabindex="-1" aria-labelledby="modalCrearMarcaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalCrearMarcaLabel">
+                    <i class="bi bi-tag me-2"></i>Nueva Marca
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formNuevaMarcaModal" action="{{ url_for('marcas.registro_marca') }}" method="POST">
+                <input type="hidden" name="estado" value="Activo">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nombre de la Marca *</label>
+                        <input type="text" name="nombre_marca" id="modal_nombre_marca" class="form-control" placeholder="Ej: Toyota, Chevrolet, Ford..." maxlength="20" required>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success fw-bold px-4" id="btnGuardarMarcaModal">
+                        <i class="bi bi-save me-1"></i>Guardar Marca
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- MODAL: REGISTRAR NUEVO PROPIETARIO RÁPIDO                                  -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="modalCrearPropietario" tabindex="-1" aria-labelledby="modalCrearPropietarioLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalCrearPropietarioLabel">
+                    <i class="bi bi-person-plus-fill me-2"></i>Registrar Nuevo Propietario
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formNuevoPropietarioModal" action="{{ url_for('propietarios.registro') }}" method="POST">
+                <input type="hidden" name="estado" value="Activo">
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Cédula / RIF *</label>
+                            <input type="number" name="cedula" id="modal_cedula" class="form-control" placeholder="Ej: 27123456" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Razón Social *</label>
+                            <input type="text" name="razon_social" id="modal_razon_social" class="form-control" placeholder="Nombre completo o Empresa" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Teléfono</label>
+                            <input type="text" name="telefono" id="modal_telefono" class="form-control" placeholder="04xx-xxxxxxx">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Correo Electrónico *</label>
+                            <input type="email" name="correo" id="modal_correo" class="form-control" placeholder="correo@ejemplo.com" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Dirección</label>
+                            <textarea name="direccion" id="modal_direccion" class="form-control" rows="2" placeholder="Ubicación física"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Tipo de Propietario</label>
+                            <select name="tipo" id="modal_tipo" class="form-select">
+                                <option value="Natural" selected>Persona Natural</option>
+                                <option value="Jurídico">Persona Jurídica</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success fw-bold px-4" id="btnGuardarPropietarioModal">
+                        <i class="bi bi-save me-1"></i>Guardar Propietario
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ url_for('static', filename='js/registro_vehiculo.js') }}?v={{ range(1, 1000) | random }}"></script>
+<script src="{{ url_for('static', filename='js/validacion_vehiculo.js') }}?v={{ range(1, 1000) | random }}"></script>
+{% endblock %}

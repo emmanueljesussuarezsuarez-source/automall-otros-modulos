@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="card shadow border-0">
+        <div class="card-header bg-primary text-white p-4">
+            <h2 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Editar Vehículo: {{ v.placa }}</h2>
+        </div>
+        <div class="card-body p-4">
+            <form id="form-editar-vehiculo" action="{{ url_for('vehiculos.editar', placa=v.placa) }}" method="POST" enctype="multipart/form-data">
+                <div class="row">
+                    <!-- DOCUMENTACIÓN Y ACCESORIOS -->
+                    <div class="col-md-4 border-end">
+                        <h5 class="text-primary"><i class="bi bi-file-earmark-check me-2"></i>Documentación</h5>
+                        <hr>
+                        <label class="form-label fw-bold">Fecha de Ingreso</label>
+                        <input type="date" name="fecha_ingreso" class="form-control mb-3" value="{{ v.fecha_ingreso }}" required>
+                        
+                        {% set docs = [
+                            ('original_totalPropiedad', 'Título de Propiedad'),
+                            ('experticia_transito', 'Experticia de Tránsito'),
+                            ('certificado_origen', 'Certificado de Origen'),
+                            ('carnet_circulacion', 'Carnet de Circulación'),
+                            ('reserva_dominio', 'Reserva de Dominio'),
+                            ('garantia_vehiculo', 'Garantía del Vehículo'),
+                            ('certificado_garantia', 'Certificado de Garantía'),
+                            ('manual_vehiculoGarantia', 'Manual del Vehículo'),
+                            ('finiquito', 'Finiquito'),
+                            ('resguardo', 'Resguardo'),
+                            ('seguro', 'Seguro / Póliza'),
+                            ('factura_compra', 'Factura de Compra')
+                        ] %}
+
+                        {% for field, label in docs %}
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" name="{{ field }}" id="{{ field }}" 
+                                   {% if v[field] == 1 %}checked{% endif %}>
+                            <label class="form-check-label">{{ label }}</label>
+                        </div>
+                        {% endfor %}
+
+                        <h5 class="mt-4 text-primary"><i class="bi bi-tools me-2"></i>Accesorios</h5>
+                        <hr>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" name="copia_llaves" id="copia_llaves" 
+                                   {% if v.copia_llaves == 1 %}checked{% endif %}>
+                            <label class="form-check-label fw-semibold" for="copia_llaves">Copia de Llaves</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" name="repuesto" id="repuesto" 
+                                   {% if v.repuesto == 1 %}checked{% endif %}>
+                            <label class="form-check-label fw-semibold" for="repuesto">Caucho de Repuesto</label>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" name="triangulo" id="triangulo" 
+                                   {% if v.triangulo == 1 %}checked{% endif %}>
+                            <label class="form-check-label fw-semibold" for="triangulo">Triángulo de Seguridad</label>
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="form-label fw-bold">Observaciones Extra / Otros</label>
+                            <textarea name="otro_documento" class="form-control" rows="3" 
+                                      placeholder="Detalles adicionales...">{{ v.otro_documento or '' }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- DETALLES TÉCNICOS Y FOTOS -->
+                    <div class="col-md-8">
+                        <h5 class="text-primary"><i class="bi bi-info-circle me-2"></i>Detalles Técnicos</h5>
+                        <hr>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="fw-bold">Placa</label>
+                                <input type="text" name="placa" class="form-control" value="{{ v.placa }}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">Color</label>
+                                <input type="text" name="color" class="form-control" value="{{ v.color }}">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">Año del Modelo</label>
+                                <input type="number" name="anio" class="form-control" value="{{ v.anio }}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">Kilometraje</label>
+                                <input type="number" name="kilometraje" class="form-control" value="{{ v.kilometraje }}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">Tipo de Vehículo</label>
+                                <select name="tipo" class="form-select" required>
+                                    <option value="" disabled>Seleccione un Tipo...</option>
+                                    {% for t in tipos %}
+                                        <option value="{{ t.cod_tipo }}" {% if v.cod_tipo == t.cod_tipo %}selected{% endif %}>
+                                            {{ t.nombre_tipo }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">Modelo</label>
+                                <select name="modelo" id="select-modelo" class="form-select" required>
+                                    {% for modelo in modelos %}
+                                    <option value="{{ modelo.cod_modelo }}" data-marca="{{ modelo.cod_marca }}"
+                                            {% if v.cod_modelo == modelo.cod_modelo %}selected{% endif %}>
+                                        {{ modelo.nombre_modelo }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">Marca</label>
+                                <select id="select-marca" class="form-select" style="background-color: #e9ecef; pointer-events: none;" tabindex="-1">
+                                    {% for marca in marcas %}
+                                    <option value="{{ marca.cod_marca }}" {% if v.cod_marca == marca.cod_marca %}selected{% endif %}>
+                                        {{ marca.nombre_marca }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="fw-bold">Estado</label>
+                                <select name="estado" class="form-select">
+                                    <option {% if v.estado == 'Disponible' %}selected{% endif %}>Disponible</option>
+                                    <option {% if v.estado == 'Vendido' %}selected{% endif %}>Vendido</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-12 mt-3">
+                                <label class="fw-bold">Propietario (Dueño Anterior)</label>
+                                <select name="cedula" class="form-select" required>
+                                    {% for prov in propietarios %}
+                                    <option value="{{ prov.cedula_propietario }}" {% if v.cedula_propietario == prov.cedula_propietario %}selected{% endif %}>
+                                        {{ prov.razon_social }} (CI: {{ prov.cedula_propietario }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- GESTIÓN DE FOTOGRAFÍAS -->
+                            <div class="col-md-12 mt-4">
+                                <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                                    <span><i class="bi bi-images me-1"></i>Fotografías del Vehículo</span>
+                                    <small class="text-muted fw-normal">Puedes eliminar fotos existentes o subir más</small>
+                                </label>
+
+                                <div class="card p-3 border rounded bg-light">
+                                    <h6 class="fw-bold text-secondary mb-2">Fotos Guardadas Actualmente:</h6>
+                                    
+                                    <!-- Contenedor oculto de URLs para borrar -->
+                                    <div id="contenedor-fotos-eliminadas"></div>
+
+                                    <div class="d-flex flex-wrap gap-3 mb-3" id="galeria-fotos-actuales">
+                                        {% if v.imagenes and v.imagenes | length > 0 %}
+                                            {% for img in v.imagenes %}
+                                            <div class="position-relative border rounded shadow-sm bg-white p-1 text-center item-foto-actual" 
+                                                 id="card-foto-{{ loop.index }}" 
+                                                 style="width: 120px;">
+                                                <div style="width: 100%; height: 80px; overflow: hidden; border-radius: 4px; background: #eee;">
+                                                    <img src="{{ url_for('static', filename=img.URL) }}" 
+                                                         style="width: 100%; height: 100%; object-fit: cover;">
+                                                </div>
+                                                
+                                                <!-- Botón para quitar foto -->
+                                                <button type="button" 
+                                                        class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 p-0 rounded-circle" 
+                                                        style="width: 24px; height: 24px; line-height: 24px; display: flex; align-items: center; justify-content: center;" 
+                                                        onclick="marcarParaEliminar('{{ img.URL }}', 'card-foto-{{ loop.index }}')"
+                                                        title="Eliminar foto">
+                                                    <i class="bi bi-x-lg" style="font-size: 0.75rem;"></i>
+                                                </button>
+                                                <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">Foto #{{ loop.index }}</small>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted small mb-0 ps-1" id="sin-fotos-msg">No hay fotografías registradas aún.</p>
+                                        {% endif %}
+                                    </div>
+
+                                    <hr class="my-2">
+
+                                    <!-- AGREGAR NUEVAS FOTOS -->
+                                    <label class="form-label fw-bold text-primary small mt-2">
+                                        <i class="bi bi-cloud-arrow-up me-1"></i>Agregar más fotos
+                                    </label>
+                                    <input type="file" name="nuevas_imagenes" id="input-nuevas-fotos" class="form-control" accept="image/*" multiple>
+                                    <small class="text-muted">Mantenga presionado Ctrl o Shift para seleccionar varias fotos a la vez.</small>
+
+                                    <!-- Previsualización de las nuevas fotos seleccionadas -->
+                                    <div id="preview-nuevas-fotos" class="d-flex flex-wrap gap-2 mt-3 p-2 bg-white rounded border" style="min-height: 50px; display: none;"></div>
+                                </div>
+                            </div>
+
+                            <!-- DATOS DE CATÁLOGO -->
+                            <div class="col-12 mt-4">
+                                <h5 class="text-success"><i class="bi bi-shop me-2"></i>Datos de Catálogo</h5>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="fw-bold">Precio ($)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-success text-white">$</span>
+                                            <input type="number" step="0.01" name="precio" class="form-control" value="{{ v.precio }}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12 mt-3">
+                                        <label class="fw-bold">Descripción para Catálogo</label>
+                                        <textarea name="descripcion_catalogo" class="form-control" rows="3" required>{{ v.descripcion_catalogo or '' }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-5 pt-3 border-top">
+                            <div class="col-md-8">
+                                <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm fw-bold">
+                                    <i class="bi bi-check-circle me-2"></i>Guardar Cambios
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ url_for('vehiculos.lista') }}" class="btn btn-outline-secondary btn-lg w-100 fw-bold">
+                                    Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ url_for('static', filename='js/registro_vehiculo.js') }}?v={{ range(1, 1000) | random }}"></script>
+<script src="{{ url_for('static', filename='js/validacion_vehiculo.js') }}?v={{ range(1, 1000) | random }}"></script>
+
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+<div class="container-fluid mt-4 px-4">
+    <div class="d-flex justify-content-end mb-3 gap-2 flex-wrap">
+        {% if tiene_permiso('Taller', 'p_crear') %}
+        <button type="button" class="btn btn-primary shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalRegistrarTaller" data-tour="taller-btn-registrar">
+            <i class="bi bi-plus-circle me-1"></i> Registrar Taller
+        </button>
+        {% endif %}
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-dark text-white p-3 border-0 d-flex justify-content-between align-items-center" data-tour="taller-header">
+            <h5 class="mb-0 fw-bold d-flex align-items-center">
+                <i class="bi bi-building me-2 text-primary"></i>Invetario de Talleres
+            </h5>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table id="tablaTalleres" class="table table-hover align-middle mb-0 nowrap" style="width:100%;" data-tour="taller-tabla">
+                    <thead class="bg-light" data-tour="taller-columnas">
+                        <tr>
+                            <th class="py-3">ID</th>
+                            <th class="py-3">Nombre</th>
+                            <th class="py-3">Dirección</th>
+                            <th class="py-3 text-center">Estado</th>
+                            <th class="py-3 text-end px-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in talleres %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-dark rounded-2 px-2 py-1 fs-7 font-monospace">
+                                    #{{ t.cod_taller }}
+                                </span>
+                            </td>
+                            <td class="text-start">{{ t.nombre_taller }}</td>
+                            <td class="text-start">{{ t.direccion }}</td>
+                            <td class="text-center">
+                                <span class="badge rounded-pill {% if t.estado == '1' or t.estado == 1 %}bg-success{% else %}bg-secondary{% endif %} px-3" data-tour="taller-estado">
+                                    {% if t.estado == '1' or t.estado == 1 %}Activo{% else %}Inactivo{% endif %}
+                                </span>
+                            </td>
+                            <td class="px-3 text-end">
+                                <div class="btn-group">
+                                    {% if tiene_permiso('Taller', 'p_actualizar') %}
+                                    <button type="button"
+                                            class="btn btn-outline-primary btn-sm rounded-start-2 btn-editar-taller"
+                                            data-id="{{ t.cod_taller }}"
+                                            data-nombre="{{ t.nombre_taller }}"
+                                            data-direccion="{{ t.direccion }}"
+                                            data-estado="{{ t.estado }}"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            data-tour="taller-btn-editar"
+                                            title="Editar Taller">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    {% endif %}
+
+                                    {% if tiene_permiso('Taller', 'p_eliminar') %}
+                                    <button type="button"
+                                            class="btn btn-outline-danger btn-sm rounded-end-2 btn-eliminar-taller"
+                                            data-url="{{ url_for('tallerbp.eliminar_taller', cod_taller=t.cod_taller) }}"
+                                            data-nombre="{{ t.nombre_taller }}"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            data-tour="taller-btn-eliminar"
+                                            title="Eliminar Taller">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalRegistrarTaller" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form method="POST" action="{{ url_for('tallerbp.crear_taller') }}" novalidate>
+                <div class="modal-header bg-dark text-white border-0">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-plus-circle me-2 text-primary"></i>Registrar Taller
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted" for="nombre_taller">Nombre del Taller</label>
+                        <input type="text" id="nombre_taller" name="nombre_taller" class="form-control" placeholder="Ingrese el nombre">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted" for="direccion">Dirección</label>
+                        <textarea id="direccion" name="direccion" class="form-control" rows="3" placeholder="Ingrese la dirección"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalEditarTaller" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <form id="formEditarTaller" method="POST" novalidate>
+                <div class="modal-header bg-dark text-white border-0">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-pencil me-2 text-primary"></i>Editar Taller
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted" for="edit_nombre_taller">Nombre del Taller</label>
+                        <input type="text" id="edit_nombre_taller" name="nombre_taller" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted" for="edit_direccion">Dirección</label>
+                        <textarea id="edit_direccion" name="direccion" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">Actualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div id="flash-messages" style="display: none;">
+            {% for category, message in messages %}
+                <div data-category="{{ category }}" data-message="{{ message }}"></div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ url_for('static', filename='js/validar_taller.js') }}"></script>
+{% endblock %}

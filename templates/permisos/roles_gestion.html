@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- DataTables CSS y SweetAlert2 -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="container-fluid mt-4 px-4">
+    <!-- Botón Superior alineado a la derecha -->
+    <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-primary shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalCrearRol">
+            <i class="bi bi-plus-circle me-1"></i> Registrar Nuevo Rol
+        </button>
+    </div>
+
+    <!-- Card Principal Unificado estilo Datatables Propietarios -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        
+        <!-- Header Oscuro -->
+        <div class="card-header bg-dark text-white p-3 border-0 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold d-flex align-items-center">
+                <i class="bi bi-people-fill me-2 text-primary"></i> Gestión de Roles
+            </h5>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 nowrap" id="tablaRoles" style="width:100%;">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="py-3">ID</th>
+                            <th class="py-3">Nombre del Rol</th>
+                            <th class="py-3">Descripción</th>
+                            <th class="py-3 text-center">Estado</th>
+                            <th class="py-3 text-end px-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in roles %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-dark rounded-2 px-2 py-1 fs-7 font-monospace">
+                                    #{{ r.cod_rol }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="fw-bold text-dark text-capitalize">
+                                    {{ r.nombre_rol }}
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="text-muted small text-break">
+                                    {{ r.descripcion_rol or 'Sin descripción' }}
+                                </span>
+                            </td>
+
+                            <td class="text-center">
+                                {% if r.estatus == 1 %}
+                                    <span class="badge rounded-pill bg-success px-3"><i class="bi bi-check-circle me-1"></i> Activo</span>
+                                {% else %}
+                                    <span class="badge rounded-pill bg-danger px-3"><i class="bi bi-x-circle me-1"></i> Inactivo</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="px-3 text-end">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-outline-primary btn-sm rounded-start-2 btn-editar-rol" 
+                                            data-id="{{ r.cod_rol }}"
+                                            data-nombre="{{ r.nombre_rol }}"
+                                            data-descripcion="{{ r.descripcion_rol or '' }}"
+                                            data-estatus="{{ r.estatus }}"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#modalEditarRol"
+                                            title="Editar Rol">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm rounded-end-2 btn-eliminar-rol" 
+                                            data-id="{{ r.cod_rol }}"
+                                            data-nombre="{{ r.nombre_rol }}"
+                                            title="Eliminar Rol">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Rol (UNICO, fuera del loop) -->
+<div class="modal fade" id="modalEditarRol" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white border-0">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-pencil-square me-2"></i>Editar Rol
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formEditarRol" data-url="">
+                <div class="modal-body p-4">
+                    <input type="hidden" id="editRolId" name="cod_rol">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Nombre del Rol <span class="text-danger">*</span></label>
+                        <input type="text" id="editRolNombre" name="nombre_rol" class="form-control input-nombre-rol" required maxlength="50">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Descripción</label>
+                        <textarea id="editRolDescripcion" name="descripcion_rol" class="form-control input-descripcion-rol" rows="2" maxlength="100"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Estatus</label>
+                        <select id="editRolEstatus" name="estatus" class="form-select input-estatus-rol">
+                            <option value="1">Activo</option>
+                            <option value="0">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Crear Rol -->
+<div class="modal fade" id="modalCrearRol" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white border-0">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-plus-circle me-2"></i>Registrar Nuevo Rol
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formCrearRol" data-url="{{ url_for('roles_crud.gestion_roles') }}">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Nombre del Rol <span class="text-danger">*</span></label>
+                        <input type="text" name="nombre_rol" class="form-control input-nombre-rol" placeholder="Ej: Vendedor, Supervisor..." required maxlength="50">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Descripción</label>
+                        <textarea name="descripcion_rol" class="form-control input-descripcion-rol" rows="2" placeholder="Breve descripción del rol..." maxlength="100"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Estatus Inicial</label>
+                        <select name="estatus" class="form-select input-estatus-rol">
+                            <option value="1" selected>Activo</option>
+                            <option value="0">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">Registrar Rol</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dataTables.bootstrap5.min.js') }}"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+<script src="{{ url_for('static', filename='js/validaciones_permisos.js') }}"></script>
+<script src="{{ url_for('static', filename='js/roles.js') }}"></script>
+{% endblock %}

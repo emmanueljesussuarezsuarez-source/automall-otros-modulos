@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+
+<div class="container-fluid mt-4 px-4">
+    <div class="d-flex justify-content-end mb-3 gap-2 flex-wrap">
+        {% if tiene_permiso('servicios', 'p_crear') %}
+        <a href="{{ url_for('servicios.crear_servicio') }}" class="btn btn-primary shadow-sm fw-bold">
+            <i class="bi bi-plus-circle me-1"></i> Registrar Servicio
+        </a>
+        {% endif %}
+
+        {% if tiene_permiso('servicios', 'p_leer') %}
+        <button type="button" class="btn btn-outline-primary shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalReporteServicios">
+            <i class="bi bi-file-earmark-text me-1"></i> Reporte
+        </button>
+        {% endif %}
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+        <div class="card-header bg-dark text-white p-3 border-0 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold d-flex align-items-center">
+                <i class="bi bi-tools me-2 text-primary"></i> Inventario de Servicios
+            </h5>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table id="tablaServicios" class="table table-hover align-middle mb-0 nowrap" style="width:100%;">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="py-3">ID</th>
+                            <th class="py-3">Servicio</th>
+                            <th class="py-3 text-center">Estado</th>
+                            <th class="py-3">Costo Base</th>
+                            <th class="py-3">Costo Final</th>
+                            <th class="py-3">Descripción</th>
+                            <th class="py-3">Fecha</th>
+                            <th class="py-3">Placa</th>
+                            <th class="py-3 text-end px-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in servicios %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-dark rounded-2 px-2 py-1 fs-7 font-monospace">
+                                    #{{ s.cod_servicios }}
+                                </span>
+                            </td>
+                            <td class="text-start fw-bold text-dark">{{ s.nombre_servicio }}</td>
+                            <td class="text-center">
+                                {% if s.estado == 'Activo' %}
+                                    <span class="badge rounded-pill bg-warning text-dark px-3"><i class="bi bi-clock me-1"></i> Activo</span>
+                                {% elif s.estado == 'Finalizado' %}
+                                    <span class="badge rounded-pill bg-success px-3"><i class="bi bi-check-circle me-1"></i> Finalizado</span>
+                                {% else %}
+                                    <span class="badge rounded-pill bg-secondary px-3">{{ s.estado }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ "${:.2f}".format(s.costo_base) if s.costo_base is not none else '-' }}</td>
+                            <td>{{ "${:.2f}".format(s.costo_final) if s.costo_final is not none else '-' }}</td>
+                            <td class="text-start">{{ s.descripcion_especifica if s.descripcion_especifica else '-' }}</td>
+                            <td>{{ s.fecha_realizacion if s.fecha_realizacion else '-' }}</td>
+                            <td>
+                                {% if s.placa %}
+                                    <span class="fw-bold text-dark">{{ s.placa }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-3 text-end">
+                                <div class="btn-group">
+                                    {% if tiene_permiso('servicios', 'p_actualizar') and s.estado == 'Activo' %}
+                                    <a href="{{ url_for('servicios.editar_servicio', cod_servicios=s.cod_servicios) }}"
+                                       class="btn btn-outline-primary btn-sm rounded-start-2"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="Editar Servicio">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    {% endif %}
+
+                                    {% if tiene_permiso('servicios', 'p_eliminar') and s.estado == 'Activo' %}
+                                    <button type="button"
+                                            class="btn btn-outline-danger btn-sm btn-eliminar-servicio"
+                                            data-url="{{ url_for('servicios.inactivar_servicio', cod_servicios=s.cod_servicios) }}"
+                                            data-nombre="{{ s.nombre_servicio }}"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Eliminar Servicio">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    {% endif %}
+
+                                    {% if s.estado == 'Activo' and s.placa and tiene_permiso('servicios', 'p_actualizar') %}
+                                    <button type="button"
+                                            class="btn btn-outline-success btn-sm btn-finalizar-servicio"
+                                            data-url="{{ url_for('servicios.finalizar_servicio', cod_servicios=s.cod_servicios, placa=s.placa) }}"
+                                            data-nombre="{{ s.nombre_servicio }}"
+                                            data-costo-final="{{ s.costo_final if s.costo_final is not none else '' }}"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Finalizar Servicio">
+                                        <i class="bi bi-check2-circle"></i>
+                                    </button>
+                                    {% endif %}
+
+                                    {% if s.estado == 'Finalizado' and tiene_permiso('servicios', 'p_leer') %}
+                                    <a href="{{ url_for('servicios.ver_recibo_servicio', cod_servicios=s.cod_servicios) }}"
+                                       class="btn btn-outline-secondary btn-sm"
+                                       target="_blank"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top"
+                                       title="Ver Recibo de Servicio">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% endif %}
+
+                                    {% set tiene_accion_activa = (s.estado == 'Activo' and (tiene_permiso('servicios', 'p_actualizar') or tiene_permiso('servicios', 'p_eliminar') or s.placa)) %}
+                                    {% set tiene_accion_fin = (s.estado == 'Finalizado' and tiene_permiso('servicios', 'p_leer')) %}
+                                    {% if not (tiene_accion_activa or tiene_accion_fin) %}
+                                        <span class="text-muted small">Sin acciones</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if tiene_permiso('servicios', 'p_leer') %}
+<div class="modal fade" id="modalReporteServicios" tabindex="-1" aria-labelledby="modalReporteServiciosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-dark text-white border-0">
+                <h5 class="modal-title fw-bold" id="modalReporteServiciosLabel">
+                    <i class="bi bi-file-earmark-text me-2 text-primary"></i>Reporte de Servicios
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <form action="{{ url_for('reporte_servicios.generar_reporte_servicios') }}" method="GET" target="_blank">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nombre_servicio_reporte" class="form-label fw-bold small text-muted">Servicio:</label>
+                            <input type="text" class="form-control" id="nombre_servicio_reporte" name="nombre_servicio" placeholder="Ej: Cambio de aceite">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="estado_reporte" class="form-label fw-bold small text-muted">Estado:</label>
+                            <select class="form-select" id="estado_reporte" name="estado">
+                                <option value="">-- Todos --</option>
+                                <option value="Activo">Activo</option>
+                                <option value="Finalizado">Finalizado</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="placa_reporte" class="form-label fw-bold small text-muted">Placa:</label>
+                            <select class="form-select" id="placa_reporte" name="placa">
+                                <option value="">-- Todos los vehículos --</option>
+                                {% for v in vehiculos %}
+                                <option value="{{ v.placa }}">{{ v.placa }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end mt-4 flex-wrap">
+                        <button type="submit" name="accion" value="ver" class="btn btn-outline-primary fw-bold">Imprimir PDF</button>
+                        <button type="submit" name="accion" value="descargar" class="btn btn-danger fw-bold">Descargar PDF</button>
+                        <button type="submit" name="accion" value="descargar_excel" class="btn btn-success fw-bold">Descargar Excel</button>
+                        <button type="submit" name="accion" value="descargar_word" class="btn btn-info text-white fw-bold">Descargar Word</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div id="flash-messages" style="display: none;">
+            {% for category, message in messages %}
+                <div data-category="{{ category }}" data-message="{{ message }}"></div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ url_for('static', filename='js/validar_servicios.js') }}"></script>
+{% endblock %}

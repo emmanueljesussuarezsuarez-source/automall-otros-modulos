@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold"></h2>
+        <a href="{{ url_for('vehiculos.registro') }}" class="btn btn-primary shadow-sm">
+            <i class="bi bi-plus-circle me-1"></i> Registrar Vehículo
+        </a>
+    </div>
+
+    <div class="container-fluid mt-4 mb-5 px-0">
+        <div class="card shadow border-0" style="border-radius: 10px;">
+            <div class="card-header bg-dark text-white p-3" style="border-radius: 10px 10px 0 0;">
+                <h5 class="mb-0"><i class="bi bi-car-front-fill me-2"></i>Inventario de Vehículos</h5>
+            </div>
+
+            <div class="card-body p-3">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 nowrap" id="tablaVehiculos" style="width:100%;">
+                        <thead class="table-light text-secondary">
+                            <tr>
+                                <th class="ps-4">Imagen</th>
+                                <th>Placa</th>
+                                <th>Marca / Modelo</th>
+                                <th>Año</th>
+                                <th>Kilometraje</th>
+                                <th>Estado</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for v in vehiculos %}
+                            <tr>
+                                <td class="ps-4">
+                                    {% if v.imagen_url %}
+                                    <!-- IMAGEN CLICKEABLE CON MODAL DE GALERÍA -->
+                                    <div class="position-relative d-inline-block" 
+                                         role="button"
+                                         data-bs-toggle="modal" 
+                                         data-bs-target="#modalGaleriaFotos"
+                                         data-placa="{{ v.placa }}"
+                                         data-vehiculo="{{ v.nombre_marca }} {{ v.nombre_modelo }}"
+                                         data-fotos='{{ v.imagenes_lista | tojson }}'
+                                         title="Haga clic para ver todas las fotos">
+                                        <img src="{{ url_for('static', filename=v.imagen_url) }}" 
+                                             class="rounded shadow-sm border img-thumbnail p-0" 
+                                             style="width: 100px; height: 70px; object-fit: cover; cursor: pointer;">
+                                        
+                                        {% if v.imagenes_lista | length > 1 %}
+                                        <span class="badge bg-dark bg-opacity-75 position-absolute bottom-0 end-0 m-1" style="font-size: 0.65rem;">
+                                            <i class="bi bi-camera-fill me-1"></i>{{ v.imagenes_lista | length }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    {% else %}
+                                    <div class="bg-light text-muted rounded text-center d-flex align-items-center justify-content-center border" 
+                                         style="width: 100px; height: 70px; font-size: 0.8rem;">
+                                        <div>
+                                            <i class="bi bi-image d-block mb-1" style="font-size: 1.5rem;"></i>
+                                            Sin Foto
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td><span class="badge bg-dark px-3">{{ v.placa }}</span></td>
+                                <td>
+                                    <div class="fw-bold">{{ v.nombre_marca }}</div>
+                                    <small class="text-muted">{{ v.nombre_modelo }}</small>
+                                </td>
+                                <td>{{ v.anio }}</td>
+                                <td>{{ v.kilometraje }} km</td>
+                                <td>
+                                    <span class="badge {% if v.estado == 'Disponible' %}bg-success{% elif v.estado == 'Vendido' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                        {{ v.estado }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group">
+                                        <!-- BOTÓN VER DETALLES -->
+                                        <button class="btn btn-sm btn-outline-info me-1" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#modalDetalles"
+                                                data-vehiculo='{{ v | tojson }}'>
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+
+                                        <!-- BOTÓN EDITAR -->
+                                        <a href="{{ url_for('vehiculos.editar', placa=v.placa) }}" class="btn btn-sm btn-outline-primary me-1">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+
+                                        <!-- BOTÓN ELIMINAR -->
+                                        <form id="form-eliminar-{{ v.placa }}" action="{{ url_for('vehiculos.eliminar', placa=v.placa) }}" method="POST" class="d-inline">
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmarEliminar('{{ v.placa }}')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PARA VER TODAS LAS FOTOS DEL VEHÍCULO -->
+<div class="modal fade" id="modalGaleriaFotos" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg overflow-hidden" style="border-radius: 20px;">
+            <div class="modal-header bg-dark text-white border-0 py-3">
+                <h5 class="modal-title mb-0" id="galeriaTitulo">
+                    <i class="bi bi-images me-2"></i>Galería de Fotografías
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0 position-relative bg-dark">
+                <!-- Carrusel -->
+                <div id="carruselVehiculo" class="carousel slide" data-bs-ride="false">
+                    <div class="carousel-inner" id="carrusel-items"></div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carruselVehiculo" data-bs-slide="prev" style="width: 12%;">
+                        <span class="carousel-control-prev-icon p-3 rounded-circle bg-dark bg-opacity-50" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carruselVehiculo" data-bs-slide="next" style="width: 12%;">
+                        <span class="carousel-control-next-icon p-3 rounded-circle bg-dark bg-opacity-50" aria-hidden="true"></span>
+                        <span class="visually-hidden">Siguiente</span>
+                    </button>
+                </div>
+
+                <!-- Barra inferior de miniaturas sobre degradado oscuro -->
+                <div class="position-absolute bottom-0 start-0 end-0 p-3 d-flex justify-content-center align-items-center flex-wrap gap-2" 
+                     id="galeria-miniaturas"
+                     style="background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 70%, transparent 100%); z-index: 5;">
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between bg-dark border-0 text-white py-2">
+                <span class="text-white-50 small" id="galeria-contador"></span>
+                <button type="button" class="btn btn-outline-light btn-sm px-4 rounded-pill" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE DETALLES -->
+<div class="modal fade" id="modalDetalles" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="bi bi-file-earmark-text me-2"></i>Expediente del Vehículo</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalBodyContent">
+                <div class="row">
+                    <div class="col-md-6 border-end">
+                        <h6 class="text-primary fw-bold mb-3">Información General</h6>
+                        <table class="table table-sm table-borderless">
+                            <tr><td><strong>Placa:</strong></td> <td id="det-placa"></td></tr>
+                            <tr><td><strong>Vehículo:</strong></td> <td id="det-vehiculo"></td></tr>
+                            <tr><td><strong>Año:</strong></td> <td id="det-anio"></td></tr>
+                            <tr><td><strong>Estado:</strong></td> <td id="det-estado"></td></tr>
+                            <tr><td><strong>Ingreso:</strong></td> <td id="det-fecha"></td></tr>
+                            <tr><td><strong>Propietario:</strong></td> <td id="det-prov"></td></tr>
+                        </table>
+                        
+                        <h6 class="text-primary fw-bold mt-4 mb-3">Accesorios</h6>
+                        <div id="det-accesorios" class="d-flex flex-wrap gap-2"></div>
+
+                        <div class="mt-3 p-2 bg-light rounded">
+                            <small class="fw-bold">Observaciones:</small><br>
+                            <small id="det-obs" class="text-muted"></small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h6 class="text-primary fw-bold mb-3">Checklist de Documentos</h6>
+                        <ul class="list-group list-group-flush small" id="det-docs"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="flask-msg-data" 
+           data-message="{{ message }}" 
+           data-category="{{ category }}" 
+           style="display:none;">
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ url_for('static', filename='js/registro_vehiculo.js') }}?v={{ range(1, 1000) | random }}"></script>
+<script src="{{ url_for('static', filename='js/validacion_vehiculo.js') }}?v={{ range(1, 1000) | random }}"></script>
+
+{% endblock %}

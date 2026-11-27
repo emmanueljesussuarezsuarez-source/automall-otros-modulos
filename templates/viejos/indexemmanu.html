@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ia_float.css') }}">
+
+{% if 'usuario_nombre' not in session %}
+<a href="{{ url_for('asistente.chat') }}" class="btn-ia-float" title="Hablar con el asistente">
+    <div class="ia-pulse"></div>
+    <i class="bi bi-stars fs-3" style="position: relative; z-index: 2;"></i>
+    <span class="ia-badge"></span>
+</a>
+{% endif %}
+
+<div id="heroCarousel" class="carousel slide carousel-fade mb-5 shadow" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1920" class="d-block w-100" alt="Lujo">
+            <div class="carousel-caption">
+                <h1 class="display-3 fw-bold">Encuentra tu próximo destino</h1>
+                <p class="lead">Explora la colección más exclusiva de vehículos en AutoMall.</p>
+                <button class="btn btn-primary btn-lg rounded-pill px-5" data-bs-toggle="modal" data-bs-target="#modalQuienesSomos">Quiénes Somos</button>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1920" class="d-block w-100" alt="Velocidad">
+            <div class="carousel-caption">
+                <h1 class="display-3 fw-bold">Potencia y Elegancia</h1>
+                <p class="lead">El rendimiento que buscas con el respaldo de profesionales.</p>
+                <button class="btn btn-primary btn-lg rounded-pill px-5" data-bs-toggle="modal" data-bs-target="#modalQuienesSomos">Quiénes Somos</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container search-container">
+    <form action="{{ url_for('catalogo.listar') }}" method="GET" class="search-bar">
+        <i class="bi bi-search"></i>
+        <input type="text" name="q" class="form-control" placeholder="Buscar por marca, modelo o año..." aria-label="Buscar">
+        <button type="submit" class="btn btn-primary rounded-pill px-4 ms-2">Buscar</button>
+    </form>
+</div>
+
+<div class="container">
+    {% if 'usuario_nombre' in session %}
+        <div class="alert alert-light border-start border-primary border-4 shadow-sm text-center p-4">
+            <h2 class="text-dark">¡Hola de nuevo, <span class="text-primary">{{ session['usuario_nombre'] }}</span>!</h2>
+            <p class="mb-0">Panel de control activo. Gestiona el inventario con las herramientas del menú superior.</p>
+        </div>
+    {% endif %}
+
+    <section class="mt-5 text-center">
+        <h2 class="section-title mb-5">Vehículos Destacados</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for v in vehiculos %}
+            <div class="col">
+                <div class="card h-100 card-vehiculo border-0 shadow-sm" style="border-radius: 15px; overflow: hidden;">
+                    <div class="position-relative">
+                        {% if v.imagen_url %}
+                        <img src="{{ url_for('static', filename=v.imagen_url) }}" class="card-img-top" alt="{{ v.nombre_modelo }}" style="height: 220px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 220px;">
+                            <i class="bi bi-image text-muted fs-1"></i>
+                        </div>
+                        {% endif %}
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge bg-success fs-6 shadow-sm">${{ "{:,.0f}".format(v.precio) }}</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold mb-1">{{ v.nombre_marca }} {{ v.nombre_modelo }}</h5>
+                        <p class="text-primary small mb-2">Año: {{ v.anio }}</p>
+                        <button class="btn btn-modern w-100 mt-2" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#modalDetalleVenta"
+                                data-vehiculo='{{ v | tojson }}'>
+                            Ver Detalles
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center py-5">
+                <p class="text-muted italic">Próximamente más vehículos disponibles...</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<div class="modal fade" id="modalDetalleVenta" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered"> 
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
+            <div class="modal-body p-0">
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3 z-3 bg-white p-2 rounded-circle shadow-sm" data-bs-dismiss="modal"></button>
+                
+                <div class="row g-0">
+                    <div class="col-lg-8 d-none d-lg-block">
+                        <div class="h-100 w-100 bg-light" style="min-height: 550px; overflow: hidden; border-radius: 25px 0 0 25px;">
+                            <img id="modal-v-img" src="" 
+                                 class="w-100 h-100" 
+                                 style="object-fit: cover; display: block; transition: all 0.5s ease;">
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 p-4 p-md-5 d-flex flex-column justify-content-center bg-white" style="border-radius: 0 25px 25px 0;">
+                        <div class="mb-4">
+                            <span id="modal-v-marca" class="text-primary fw-bold text-uppercase ls-wider small"></span>
+                            <h2 id="modal-v-modelo" class="display-5 fw-bold text-dark mt-1"></h2>
+                            <span id="modal-v-anio" class="badge bg-light text-primary border px-3 py-2 rounded-pill mt-2"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <h3 id="modal-v-precio" class="text-success fw-bold display-6 mb-0"></h3>
+                            <p class="text-muted small">Precio Final / Negociable</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-dark border-bottom pb-2"><i class="bi bi-info-circle me-2"></i>Especificaciones</h6>
+                            <p id="modal-v-desc" class="text-muted" style="font-size: 0.95rem; line-height: 1.6;"></p>
+                        </div>
+
+                        <div class="mt-auto">
+                            <button class="btn btn-primary w-100 btn-lg rounded-pill shadow-sm py-3 fw-bold">
+                                <a href="{{ url_for('citas.agendar') }}" class="text-white text-decoration-none">Agendar Cita</a>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/registro_vehiculo.js') }}?v={{ range(1, 1000) | random }}"></script>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        title: "{{ '¡Éxito!' if category == 'success' else '¡Atención!' }}",
+                        text: "{{ message }}",
+                        icon: "{{ category if category in ['success', 'error', 'warning', 'info'] else 'info' }}",
+                        confirmButtonText: 'Aceptar',
+                        confirmButtonColor: '#0d6efd'
+                    });
+                });
+            </script>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+{% endblock %}
